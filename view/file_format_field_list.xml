@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!-- The COPYRIGHT file at the top level of this repository contains the full
+     copyright notices and license terms. -->
+<tree string="File Format Field" editable="bottom">
+    <field name="format"/>
+    <field name="sequence"/>
+    <field name="name"/>
+    <field name="length"/>
+    <field name="fill_character"/>
+    <field name="align"/>
+    <field name="number_format"/>
+    <field name="decimal_character"/>
+    <field name="expression"/>
+</tree>

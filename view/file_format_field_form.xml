@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!-- The COPYRIGHT file at the top level of this repository contains the full
+     copyright notices and license terms. -->
+<form string="File Format Field">
+    <label name="format"/>
+    <field name="format"/>
+    <newline/>
+    <label name="name"/>
+    <field name="name"/>
+    <label name="sequence"/>
+    <field name="sequence"/>
+    <group id="length_fields" colspan="4" col="6">
+        <label name="length"/>
+        <field name="length"/>
+        <label name="fill_character"/>
+        <field name="fill_character"/>
+        <label name="align"/>
+        <field name="align"/>
+    </group>
+    <label name="number_format"/>
+    <field name="number_format"/>
+    <label name="decimal_character"/>
+    <field name="decimal_character"/>
+    <separator name="expression" colspan="4"/>
+    <field name="expression" colspan="4"/>
+</form>

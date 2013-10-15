@@ -1,0 +1,221 @@
+# The COPYRIGHT file at the top level of this repository contains the full
+# copyright notices and license terms.
+import logging
+import os.path
+import traceback
+import unicodedata
+
+from trytond.model import ModelSQL, ModelView, fields
+from trytond.pyson import Eval, Greater, Not
+from trytond.rpc import RPC
+from trytond.pool import Pool
+
+
+__all__ = ['FileFormat', 'FileFormatField']
+
+
+def unaccent(text):
+    if isinstance(text, str):
+        text = unicode(text, 'utf-8')
+    elif isinstance(text, unicode):
+        pass
+    else:
+        return str(text)
+    return unicodedata.normalize('NFKD', text).encode('ASCII', 'ignore')
+
+
+class FileFormat(ModelSQL, ModelView):
+    '''File Format'''
+    __name__ = 'file.format'
+
+    name = fields.Char('Name', required=True, select=True)
+    path = fields.Char('Path', required=True,
+        help='The path to the file name. The last slash is not necessary.')
+    file_name = fields.Char('File Name', required=True)
+    header = fields.Boolean('Header', help='Header (fields name) on files.')
+    separator = fields.Char('Separator', size=1,
+        help='Put here, if it\'s necessary, the separator between each field.')
+    quote = fields.Char('Quote', size=1,
+        help='Character to use as quote.')
+    model = fields.Many2One('ir.model', 'Model', required=True)
+    fields = fields.One2Many('file.format.field', 'format', 'Fields')
+
+    @classmethod
+    def __setup__(cls):
+        super(FileFormat, cls).__setup__()
+        cls.__rpc__.update({
+                'export_file': RPC(instantiate=0),
+                })
+        cls._error_messages.update({
+            'path_not_exists': 'The Path "%(path)s" of File Format '
+                '"%(file_format)s" doesn\'t exists.',
+            'path_no_permission': 'The Tryton server user '
+                'doesn\'t have enough permissions over the Path "%(path)s" of '
+                'File Format "%(file_format)s".\n'
+                'Please, contact with your server administrator.',
+            })
+
+    @staticmethod
+    def default_quote():
+        return ''
+
+    @staticmethod
+    def default_separator():
+        return ''
+
+    @classmethod
+    def validate(cls, file_formats):
+        super(FileFormat, cls).validate(file_formats)
+        cls.check_file_path(file_formats)
+
+    @classmethod
+    def check_file_path(cls, file_formats):
+        for file_format in file_formats:
+            if not os.path.isdir(file_format.path):
+                cls.raise_user_error('path_not_exists', {
+                        'path': file_format.path,
+                        'file_format': file_format.rec_name,
+                        })
+            if (not os.access(file_format.path, os.R_OK)
+                    or not os.access(file_format.path, os.W_OK)):
+                cls.raise_user_error('path_no_permission', {
+                        'path': file_format.path,
+                        'file_format': file_format.rec_name,
+                        })
+
+    def export_file(self, instance_ids):
+        pool = Pool()
+        Model = pool.get(self.model.model)
+
+        header_line = []
+        lines = []
+        for instance in Model.browse(instance_ids):
+            fields = []
+            headers = []
+            for field in self.fields:
+                try:
+                    field_eval = eval(field.expression.replace('$',
+                            'instance.'))
+                except:
+                    field_eval = ''
+                    #logging.getLogger('fileformat').warning('Exception '
+                    #    'evaluating expression of field %s (%s) from File '
+                    #    'Format %s (%s):\n%s' % (field.name, field.id,
+                    #        self.name, self.id, traceback.format_exc()))
+
+                #logging.getLogger('fileformat').debug('The expression to '
+                #    'export for the "%s" file is "%s" and it\'s val: "%s"'
+                #    % (self.name, field.expression, field_eval))
+
+                if isinstance(field_eval, (int, float)):
+                    if field.number_format:
+                        field_eval = field.number_format % field_eval
+                    if field.decimal_character:
+                        field_eval = str(field_eval).replace('.',
+                            unaccent(field.decimal_character) or '')
+
+                ffield = unaccent(field_eval)
+                # If the length of the field is 0, it's means that dosen't
+                # matter how many chars it take
+                if field.length > 0:
+                    if field.align == 'right':
+                        ffield = ffield.rjust(field.length,
+                            unaccent(field.fill_character))
+                    else:
+                        ffield = ffield.ljust(field.length,
+                            unaccent(field.fill_character))
+                    ffield = ffield[:field.length]
+
+                field_header = unaccent(field.name)
+                if self.quote:
+                    if self.quote == '"':
+                        ffield = ffield.replace('"', "'")
+                    elif self.quote == "'":
+                        ffield = ffield.replace("'", '"')
+                    ffield = self.quote + ffield + self.quote
+                    field_header = self.quote + field_header + self.quote
+
+                fields.append(ffield)
+                headers.append(field_header)
+
+            separator = self.separator or ''
+            lines.append(separator.join(fields))
+            if not header_line:
+                header_line.append(separator.join(headers))
+
+        try:
+            file_path = self.path + "/" + self.file_name
+            # Control if we need the headers + if the path file doesn't exists
+            # and is a file. To add the headers or not
+            if self.header and not os.path.isfile(file_path):
+                # Write the headers in the file
+                with open(file_path, 'w') as output_file:
+                    for header in header_line:
+                        output_file.write(header + "\r\n")
+
+            # Put the inselfion in the file
+            with open(file_path, 'a+') as output_file:
+                for line in lines:
+                    output_file.write(line + "\r\n")
+            #logging.getLogger('file.format').info('The file "%s" is write '
+            #    'correctly' % self.file_name)
+        except:
+            pass
+
+
+class FileFormatField(ModelSQL, ModelView):
+    '''File Format Field'''
+    __name__ = 'file.format.field'
+    _order = [('sequence', 'ASC')]
+    _rec_name = 'sequence'
+
+    format = fields.Many2One('file.format', 'Format', required=True,
+        select=True, ondelete='CASCADE')
+    name = fields.Char('Name', size=30, required=True, select=True,
+        help='The name of the field. It\'s used if you have selected the '
+        'Header checkbox.')
+    sequence = fields.Integer('Sequence', required=True,
+        help='The order that you want for the field\'s column in the file.')
+    length = fields.Integer('Length',
+        help='Set 0 if there isn\'t any required length for the field.')
+    fill_character = fields.Char('Fill Char', size=1, states={
+            'required': Greater(Eval('length', 0), 0),
+            'readonly': Not(Greater(Eval('length', 0), 0)),
+            }, depends=['length'],
+        help='If you set a specific length, this character will be used to '
+        'fill the field until the specified length.')
+    align = fields.Selection([
+            (None, ''),
+            ('left', 'Left'),
+            ('right', 'Right'),
+            ], 'Align',
+        states={
+            'readonly': Not(Greater(Eval('length', 0), 0)),
+            }, depends=['length'],
+        help='If you set a specific length, you can decid the alignment of '
+        'the value.')
+    number_format = fields.Char('Number Format',
+        help='Expression to format as string an integer or float field.\n'
+        'E.g: if you have a float and want 2 decimals, write here "%.2f" '
+        '(without quotes).')
+    decimal_character = fields.Char('Decimal Character', size=1,
+        help='If you need and specific decimal character for the float fields')
+    expression = fields.Text('Expression',
+        help='Python code for field processing. The fields are called like '
+        '"$field_name" (without quotes).')
+
+    @staticmethod
+    def default_sequence():
+        return 1
+
+    @staticmethod
+    def default_length():
+        return 0
+
+    @staticmethod
+    def default_fill_character():
+        return ''
+
+    @staticmethod
+    def default_align():
+        return 'left'

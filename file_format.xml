@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tryton>
+    <data>
+        <!-- res.group -->
+        <record model="res.group" id="group_file_format_admin">
+            <field name="name">File Format Configuration</field>
+        </record>
+        <record model="res.user-res.group"
+            id="user_admin_group_file_format_admin">
+            <field name="user" ref="res.user_admin"/>
+            <field name="group" ref="group_file_format_admin"/>
+        </record>
+        <record model="res.user-res.group"
+            id="user_trigger_group_file_format_admin">
+            <field name="user" ref="res.user_trigger"/>
+            <field name="group" ref="group_file_format_admin"/>
+        </record>
+
+        <!-- file.format -->
+        <record model="ir.ui.view" id="file_format_view_form">
+            <field name="model">file.format</field>
+            <field name="type">form</field>
+            <field name="name">file_format_form</field>
+        </record>
+
+        <record model="ir.ui.view" id="file_format_view_list">
+            <field name="model">file.format</field>
+            <field name="type">tree</field>
+            <field name="name">file_format_list</field>
+        </record>
+
+        <record model="ir.action.act_window" id="act_file_format">
+            <field name="name">File Format</field>
+            <field name="res_model">file.format</field>
+        </record>
+        <record model="ir.action.act_window.view" id="act_file_format_view1">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="file_format_view_list"/>
+            <field name="act_window" ref="act_file_format"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_file_format_view2">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="file_format_view_form"/>
+            <field name="act_window" ref="act_file_format"/>
+        </record>
+
+        <record model="ir.model.access" id="access_file_format">
+            <field name="model" search="[('model', '=', 'file.format')]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+        <record model="ir.model.access" id="access_file_format_admin">
+            <field name="model" search="[('model', '=', 'file.format')]"/>
+            <field name="group" ref="group_file_format_admin"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+
+        <!-- file.format.field -->
+        <record model="ir.ui.view" id="file_format_field_view_form">
+            <field name="model">file.format.field</field>
+            <field name="type">form</field>
+            <field name="name">file_format_field_form</field>
+        </record>
+
+        <record model="ir.ui.view" id="file_format_field_view_list">
+            <field name="model">file.format.field</field>
+            <field name="type">tree</field>
+            <field name="name">file_format_field_list</field>
+        </record>
+
+        <record model="ir.action.act_window" id="act_file_format_field">
+            <field name="name">File Format Field</field>
+            <field name="res_model">file.format.field</field>
+        </record>
+        <record model="ir.action.act_window.view"
+            id="act_file_format_field_view1">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="file_format_field_view_list"/>
+            <field name="act_window" ref="act_file_format_field"/>
+        </record>
+        <record model="ir.action.act_window.view"
+            id="act_file_format_field_view2">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="file_format_field_view_form"/>
+            <field name="act_window" ref="act_file_format_field"/>
+        </record>
+
+        <record model="ir.model.access" id="access_file_format_field">
+            <field name="model"
+                search="[('model', '=', 'file.format.field')]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+        <record model="ir.model.access" id="access_file_format_field_admin">
+            <field name="model"
+                search="[('model', '=', 'file.format.field')]"/>
+            <field name="group" ref="group_file_format_admin"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+
+        <!-- Menus -->
+        <menuitem id="menu_file_format_root" name="File Format"
+            sequence="8888"/>
+        <record model="ir.ui.menu-res.group"
+            id="menu_file_format_root_group_file_format_admin">
+            <field name="menu" ref="menu_file_format_root"/>
+            <field name="group" ref="group_file_format_admin"/>
+        </record>
+
+        <menuitem id="menu_file_format" action="act_file_format"
+            parent="menu_file_format_root" sequence="1"/>
+    </data>
+</tryton>

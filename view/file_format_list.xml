@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- The COPYRIGHT file at the top level of this repository contains the full
+     copyright notices and license terms. -->
+<tree string="File Format">
+    <field name="name"/>
+    <field name="path"/>
+    <field name="file_name"/>
+    <field name="model"/>
+    <field name="header"/>
+    <field name="separator"/>
+    <field name="quote"/>
+    <field name="fields"/>
+</tree>
