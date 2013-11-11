@@ -2,3 +2,5 @@
 # copyright notices and license terms.
 
 from .test_file_format import suite
+
+__all__ = ['suite']

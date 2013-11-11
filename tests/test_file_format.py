@@ -17,9 +17,9 @@ from trytond.tests.test_tryton import POOL, DB_NAME, USER, CONTEXT, test_view,\
 from trytond.transaction import Transaction
 
 
-class TestCase(unittest.TestCase):
+class FileFormatTestCase(unittest.TestCase):
     '''
-    Test module.
+    Test File Format module.
     '''
 
     def setUp(self):
@@ -105,7 +105,7 @@ class TestCase(unittest.TestCase):
 
 def suite():
     suite = trytond.tests.test_tryton.suite()
-    suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestCase))
+    suite.addTests(unittest.TestLoader().loadTestsFromTestCase(FileFormatTestCase))
     return suite
 
 if __name__ == '__main__':
