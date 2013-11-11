@@ -39,7 +39,7 @@ tests_require = ['proteus >= %s.%s, < %s.%s' %
 
 setup(name='%s_%s' % (PREFIX, MODULE),
     version=info.get('version', '0.0.1'),
-    description='Tryton module generate CSV files to send a carrier',
+    description='Tryton module generate CSV files',
     long_description=read('README'),
     author='NaN·tic',
     url='http://www.nan-tic.com/',
