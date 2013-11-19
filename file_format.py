@@ -166,9 +166,6 @@ class FileFormat(ModelSQL, ModelView):
 class FileFormatField(ModelSQL, ModelView):
     '''File Format Field'''
     __name__ = 'file.format.field'
-    _order = [('sequence', 'ASC')]
-    _rec_name = 'sequence'
-
     format = fields.Many2One('file.format', 'Format', required=True,
         select=True, ondelete='CASCADE')
     name = fields.Char('Name', size=30, required=True, select=True,
@@ -203,6 +200,11 @@ class FileFormatField(ModelSQL, ModelView):
     expression = fields.Text('Expression',
         help='Python code for field processing. The fields are called like '
         '"$field_name" (without quotes).')
+
+    @classmethod
+    def __setup__(cls):
+        super(FileFormatField, cls).__setup__()
+        cls._order.insert(0, ('sequence', 'ASC'))
 
     @staticmethod
     def default_sequence():
