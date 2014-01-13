@@ -1,0 +1,244 @@
+# 
+msgid ""
+msgstr "Content-Type: text/plain; charset=utf-8\n"
+
+msgctxt "error:file.format:"
+msgid "The Path \"%(path)s\" of File Format \"%(file_format)s\" doesn't exists."
+msgstr "La ruta \"%(path)s\" pel format de fitxer \"%(file_format)s\" no existeix."
+
+msgctxt "error:file.format:"
+msgid ""
+"The Tryton server user doesn't have enough permissions over the Path \"%(path)s\" of File Format \"%(file_format)s\".\n"
+"Please, contact with your server administrator."
+msgstr ""
+"L'usuari del servidor Tryton no té permisos suficient sobre el directori \"%(path)s\" utilitzat pel format de fitxers \"%(file_format)s\".\n"
+"Si us plau, contacti amb l'administrador del servidor."
+
+msgctxt "field:file.format,create_date:"
+msgid "Create Date"
+msgstr "Data de creació"
+
+msgctxt "field:file.format,create_uid:"
+msgid "Create User"
+msgstr "Usuari de creació"
+
+msgctxt "field:file.format,fields:"
+msgid "Fields"
+msgstr "Camps"
+
+msgctxt "field:file.format,file_name:"
+msgid "File Name"
+msgstr "Nom del camp"
+
+msgctxt "field:file.format,header:"
+msgid "Header"
+msgstr "Capçalera"
+
+msgctxt "field:file.format,id:"
+msgid "ID"
+msgstr "Identificador"
+
+msgctxt "field:file.format,model:"
+msgid "Model"
+msgstr "Model"
+
+msgctxt "field:file.format,name:"
+msgid "Name"
+msgstr "Nom"
+
+msgctxt "field:file.format,path:"
+msgid "Path"
+msgstr "Ruta"
+
+msgctxt "field:file.format,quote:"
+msgid "Quote"
+msgstr "Cometes"
+
+msgctxt "field:file.format,rec_name:"
+msgid "Name"
+msgstr "Nom"
+
+msgctxt "field:file.format,separator:"
+msgid "Separator"
+msgstr "Separador"
+
+msgctxt "field:file.format,write_date:"
+msgid "Write Date"
+msgstr "Data modificació"
+
+msgctxt "field:file.format,write_uid:"
+msgid "Write User"
+msgstr "Usuari modificació"
+
+msgctxt "field:file.format.field,align:"
+msgid "Align"
+msgstr "Alineació"
+
+msgctxt "field:file.format.field,create_date:"
+msgid "Create Date"
+msgstr "Data de creació"
+
+msgctxt "field:file.format.field,create_uid:"
+msgid "Create User"
+msgstr "Usuari de creació"
+
+msgctxt "field:file.format.field,decimal_character:"
+msgid "Decimal Character"
+msgstr "Caràcter decimals"
+
+msgctxt "field:file.format.field,expression:"
+msgid "Expression"
+msgstr "Expressió"
+
+msgctxt "field:file.format.field,fill_character:"
+msgid "Fill Char"
+msgstr "Caràcter emplenat"
+
+msgctxt "field:file.format.field,format:"
+msgid "Format"
+msgstr "Format"
+
+msgctxt "field:file.format.field,id:"
+msgid "ID"
+msgstr "Identificador"
+
+msgctxt "field:file.format.field,length:"
+msgid "Length"
+msgstr "Longitud"
+
+msgctxt "field:file.format.field,name:"
+msgid "Name"
+msgstr "Nom"
+
+msgctxt "field:file.format.field,number_format:"
+msgid "Number Format"
+msgstr "Format nombres"
+
+msgctxt "field:file.format.field,rec_name:"
+msgid "Name"
+msgstr "Nom"
+
+msgctxt "field:file.format.field,sequence:"
+msgid "Sequence"
+msgstr "Seqüència"
+
+msgctxt "field:file.format.field,write_date:"
+msgid "Write Date"
+msgstr "Data modificació"
+
+msgctxt "field:file.format.field,write_uid:"
+msgid "Write User"
+msgstr "Usuari modificació"
+
+msgctxt "help:file.format,header:"
+msgid "Header (fields name) on files."
+msgstr "Capçalera (nom dels camps) als fitxers."
+
+msgctxt "help:file.format,path:"
+msgid "The path to the file name. The last slash is not necessary."
+msgstr "La ruta cap al fitxer. L'última barra no és necessària."
+
+msgctxt "help:file.format,quote:"
+msgid "Character to use as quote."
+msgstr "Caràcter a utilitzar com a cometes"
+
+msgctxt "help:file.format,separator:"
+msgid "Put here, if it's necessary, the separator between each field."
+msgstr ""
+"Posi aquí, si es necessari, el caracter a utilitzar com a separador entre "
+"cada camp."
+
+msgctxt "help:file.format.field,align:"
+msgid ""
+"If you set a specific length, you can decid the alignment of the value."
+msgstr "Si defineix una mida específica, pot decidir l'alineació del valor."
+
+msgctxt "help:file.format.field,decimal_character:"
+msgid "If you need and specific decimal character for the float fields"
+msgstr "Si necessita un caràcter específic pels valor amb decimals."
+
+msgctxt "help:file.format.field,expression:"
+msgid ""
+"Python code for field processing. The fields are called like \"$field_name\""
+" (without quotes)."
+msgstr ""
+"Codi Python pel processat del camp. Els camps són cridats com "
+"\"$nom_del_camp\" (sense les cometes)."
+
+msgctxt "help:file.format.field,fill_character:"
+msgid ""
+"If you set a specific length, this character will be used to fill the field "
+"until the specified length."
+msgstr ""
+"Sio especifica una llargada específica, aquest caràcter s'utilitzarà per "
+"omplir el camp fins completar-lo."
+
+msgctxt "help:file.format.field,length:"
+msgid "Set 0 if there isn't any required length for the field."
+msgstr "Posi un 0 si no es requereix una mida concreta pel camp."
+
+msgctxt "help:file.format.field,name:"
+msgid ""
+"The name of the field. It's used if you have selected the Header checkbox."
+msgstr "El nom del camp. S'utilitza si ha escollit l'opció \"Capçalera\"."
+
+msgctxt "help:file.format.field,number_format:"
+msgid ""
+"Expression to format as string an integer or float field.\n"
+"E.g: if you have a float and want 2 decimals, write here \"%.2f\" (without quotes)."
+msgstr ""
+"Expressió per donar format com a text un camp enter o decimal.\n"
+"P.e: si mostrar dos decimals, escrigui aquí \"%.2f\" (sense les cometes)."
+
+msgctxt "help:file.format.field,sequence:"
+msgid "The order that you want for the field's column in the file."
+msgstr "L'ordre que voldrà per la columna d'aquest camp al fitxer."
+
+msgctxt "model:file.format,name:"
+msgid "File Format"
+msgstr "Format fitxer"
+
+msgctxt "model:file.format.field,name:"
+msgid "File Format Field"
+msgstr "Camp format fitxer"
+
+msgctxt "model:ir.action,name:act_file_format"
+msgid "File Format"
+msgstr "Format fitxer"
+
+msgctxt "model:ir.action,name:act_file_format_field"
+msgid "File Format Field"
+msgstr "Camp format fitxer"
+
+msgctxt "model:ir.ui.menu,name:menu_file_format"
+msgid "File Format"
+msgstr "Format fitxer"
+
+msgctxt "model:ir.ui.menu,name:menu_file_format_root"
+msgid "File Format"
+msgstr "Format fitxer"
+
+msgctxt "model:res.group,name:group_file_format_admin"
+msgid "File Format Configuration"
+msgstr "Configuració format fitxer"
+
+#, fuzzy
+msgctxt "selection:file.format.field,align:"
+msgid ""
+msgstr " "
+
+msgctxt "selection:file.format.field,align:"
+msgid "Left"
+msgstr "Esquerra"
+
+msgctxt "selection:file.format.field,align:"
+msgid "Right"
+msgstr "Dreta"
+
+msgctxt "view:file.format.field:"
+msgid "File Format Field"
+msgstr "Camp format fitxer"
+
+msgctxt "view:file.format:"
+msgid "File Format"
+msgstr "Format fitxer"
