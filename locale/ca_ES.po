@@ -28,7 +28,7 @@ msgstr "Camps"
 
 msgctxt "field:file.format,file_name:"
 msgid "File Name"
-msgstr "Nom del camp"
+msgstr "Nom del fitxer"
 
 msgctxt "field:file.format,header:"
 msgid "Header"
