@@ -47,12 +47,12 @@ class FileFormat(ModelSQL, ModelView):
                 'export_file': RPC(instantiate=0),
                 })
         cls._error_messages.update({
-            'path_not_exists': 'The Path "%(path)s" of File Format '
-                '"%(file_format)s" doesn\'t exists.',
-            'path_no_permission': 'The Tryton server user '
+            'path_not_exists': ('The Path "%(path)s" of File Format '
+                '"%(file_format)s" doesn\'t exists.'),
+            'path_no_permission': ('The Tryton server user '
                 'doesn\'t have enough permissions over the Path "%(path)s" of '
                 'File Format "%(file_format)s".\n'
-                'Please, contact with your server administrator.',
+                'Please, contact with your server administrator.'),
             })
 
     @staticmethod
@@ -98,14 +98,12 @@ class FileFormat(ModelSQL, ModelView):
                             'instance.'))
                 except:
                     field_eval = ''
-                    #logging.getLogger('fileformat').warning('Exception '
-                    #    'evaluating expression of field %s (%s) from File '
-                    #    'Format %s (%s):\n%s' % (field.name, field.id,
-                    #        self.name, self.id, traceback.format_exc()))
-
-                #logging.getLogger('fileformat').debug('The expression to '
-                #    'export for the "%s" file is "%s" and it\'s val: "%s"'
-                #    % (self.name, field.expression, field_eval))
+                    logging.getLogger('file.format').warning('Exception '
+                        'evaluating expression of field %s (%s) from File '
+                        'Format %s (%s) for instance %s (%s):\n%s' % (
+                            field.rec_name, field.id, self.rec_name, self.id,
+                            instance.rec_name, instance.id,
+                            traceback.format_exc()))
 
                 if isinstance(field_eval, (int, float)):
                     if field.number_format:
@@ -157,8 +155,8 @@ class FileFormat(ModelSQL, ModelView):
             with open(file_path, 'a+') as output_file:
                 for line in lines:
                     output_file.write(line + "\r\n")
-            #logging.getLogger('file.format').info('The file "%s" is write '
-            #    'correctly' % self.file_name)
+            logging.getLogger('file.format').info('The file "%s" is write '
+                'correctly' % self.file_name)
         except:
             pass
 
