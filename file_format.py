@@ -6,9 +6,10 @@ import traceback
 import unicodedata
 
 from trytond.model import ModelSQL, ModelView, fields
+from trytond.pool import Pool
 from trytond.pyson import Eval, Greater, Not
 from trytond.rpc import RPC
-from trytond.pool import Pool
+from trytond.tools import safe_eval
 
 
 __all__ = ['FileFormat', 'FileFormatField']
@@ -94,7 +95,7 @@ class FileFormat(ModelSQL, ModelView):
             headers = []
             for field in self.fields:
                 try:
-                    field_eval = eval(field.expression.replace('$',
+                    field_eval = safe_eval(field.expression.replace('$',
                             'instance.'))
                 except:
                     field_eval = ''
@@ -166,7 +167,7 @@ class FileFormatField(ModelSQL, ModelView):
     __name__ = 'file.format.field'
     format = fields.Many2One('file.format', 'Format', required=True,
         select=True, ondelete='CASCADE')
-    name = fields.Char('Name', size=30, required=True, select=True,
+    name = fields.Char('Name', size=None, required=True, select=True,
         help='The name of the field. It\'s used if you have selected the '
         'Header checkbox.')
     sequence = fields.Integer('Sequence', required=True,
