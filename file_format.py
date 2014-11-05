@@ -84,6 +84,13 @@ class FileFormat(ModelSQL, ModelView):
                         'file_format': file_format.rec_name,
                         })
 
+    @property
+    def eval_context(self):
+        'Returns the context used for safe_eval'
+        return {
+            'len': len,
+            }
+
     def export_file(self, instance_ids):
         pool = Pool()
         Model = pool.get(self.model.model)
@@ -93,10 +100,12 @@ class FileFormat(ModelSQL, ModelView):
         for instance in Model.browse(instance_ids):
             fields = []
             headers = []
+            eval_context = self.eval_context.copy()
+            eval_context.update({'instance': instance})
             for field in self.fields:
                 try:
                     field_eval = safe_eval(field.expression.replace('$',
-                            'instance.'))
+                            'instance.'), eval_context)
                 except:
                     field_eval = ''
                     logging.getLogger('file.format').warning('Exception '
