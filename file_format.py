@@ -104,8 +104,11 @@ class FileFormat(ModelSQL, ModelView):
             eval_context.update({'instance': instance})
             for field in self.fields:
                 try:
-                    field_eval = safe_eval(field.expression.replace('$',
-                            'instance.'), eval_context)
+                    if field and field.expression:
+                        field_eval = safe_eval(field.expression.replace('$',
+                                'instance.'), eval_context)
+                    else:
+                        field_eval = ''
                 except:
                     field_eval = ''
                     logging.getLogger('file.format').warning('Exception '
