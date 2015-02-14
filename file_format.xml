@@ -112,7 +112,8 @@
 
         <!-- Menus -->
         <menuitem id="menu_file_format_root" name="File Format"
-            sequence="8888"/>
+            parent="ir.menu_administration" sequence="8888"/>
+
         <record model="ir.ui.menu-res.group"
             id="menu_file_format_root_group_file_format_admin">
             <field name="menu" ref="menu_file_format_root"/>

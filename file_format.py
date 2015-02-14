@@ -31,6 +31,7 @@ class FileFormat(ModelSQL, ModelView):
 
     name = fields.Char('Name', required=True, select=True)
     path = fields.Char('Path', required=True,
+        states={'required': Eval('state') == 'active'},
         help='The path to the file name. The last slash is not necessary.')
     file_name = fields.Char('File Name', required=True)
     header = fields.Boolean('Header', help='Header (fields name) on files.')
@@ -39,6 +40,10 @@ class FileFormat(ModelSQL, ModelView):
     quote = fields.Char('Quote', size=1,
         help='Character to use as quote.')
     model = fields.Many2One('ir.model', 'Model', required=True)
+    state = fields.Selection([
+            ('active', 'Active'),
+            ('disabled', 'Disabled'),
+            ], 'State', required=True, select=True)
     fields = fields.One2Many('file.format.field', 'format', 'Fields')
 
     @classmethod
@@ -61,6 +66,10 @@ class FileFormat(ModelSQL, ModelView):
         return ''
 
     @staticmethod
+    def default_state():
+        return 'active'
+
+    @staticmethod
     def default_separator():
         return ''
 
@@ -72,6 +81,8 @@ class FileFormat(ModelSQL, ModelView):
     @classmethod
     def check_file_path(cls, file_formats):
         for file_format in file_formats:
+            if file_format.state == 'disable':
+                continue
             if not os.path.isdir(file_format.path):
                 cls.raise_user_error('path_not_exists', {
                         'path': file_format.path,
