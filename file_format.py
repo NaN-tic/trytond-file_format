@@ -82,7 +82,7 @@ class FileFormat(ModelSQL, ModelView):
     @classmethod
     def check_file_path(cls, file_formats):
         for file_format in file_formats:
-            if not file_format.path:
+            if not file_format.path or file_format.state == 'disabled':
                 continue
             if not os.path.isdir(file_format.path):
                 cls.raise_user_error('path_not_exists', {
