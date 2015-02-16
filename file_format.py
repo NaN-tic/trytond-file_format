@@ -30,8 +30,9 @@ class FileFormat(ModelSQL, ModelView):
     __name__ = 'file.format'
 
     name = fields.Char('Name', required=True, select=True)
-    path = fields.Char('Path', required=True,
-        states={'required': Eval('state') == 'active'},
+    path = fields.Char('Path', states={
+            'required': Eval('state') == 'active',
+        }, depends=['state'],
         help='The path to the file name. The last slash is not necessary.')
     file_name = fields.Char('File Name', required=True)
     header = fields.Boolean('Header', help='Header (fields name) on files.')
@@ -67,7 +68,7 @@ class FileFormat(ModelSQL, ModelView):
 
     @staticmethod
     def default_state():
-        return 'active'
+        return 'disabled'
 
     @staticmethod
     def default_separator():
@@ -81,7 +82,7 @@ class FileFormat(ModelSQL, ModelView):
     @classmethod
     def check_file_path(cls, file_formats):
         for file_format in file_formats:
-            if file_format.state == 'disable':
+            if not file_format.path:
                 continue
             if not os.path.isdir(file_format.path):
                 cls.raise_user_error('path_not_exists', {
