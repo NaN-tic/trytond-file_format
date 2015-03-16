@@ -35,7 +35,7 @@ class FileFormatTestCase(unittest.TestCase):
 
     def test0010export_csv_file(self):
         '''
-        Test FileFormat.export_file.
+        Test FileFormat.export_csv_file.
         '''
         with Transaction().start(DB_NAME, USER, context=CONTEXT):
             model_model, = self.model.search([
@@ -93,13 +93,13 @@ class FileFormatTestCase(unittest.TestCase):
 
             self.assertEqual(file_content, (
                     '"module","model","name","N. fields","N. fields 2"\r\n'
-                    '"file_format","file.format","----File Format","14,00",'
-                    '"14.00"\r\n'))
+                    '"file_format","file.format","----File Format","17,00",'
+                    '"17.00"\r\n'))
             os.unlink(temp_file.name)
 
     def test0010export_xml_file(self):
         '''
-        Test FileFormat.export_file.
+        Test FileFormat.export_xml_file.
         '''
         with Transaction().start(DB_NAME, USER, context=CONTEXT):
             model_model, = self.model.search([
@@ -116,6 +116,7 @@ class FileFormatTestCase(unittest.TestCase):
             file_format.path = os.path.dirname(temp_file.name)
             file_format.file_name = os.path.basename(temp_file.name)
             file_format.file_type = 'xml'
+            file_format.model = model_model
 
             file_format.xml_format = """
                 <?xml version="1.0" encoding="utf-8"?>
@@ -136,6 +137,8 @@ class FileFormatTestCase(unittest.TestCase):
 
             file_format.export_file([file_format_model.id])
 
+            temp_file.name = (file_format.path + "/" +
+                str(file_format_model.id) + file_format.file_name)
             with open(temp_file.name) as output_file:
                 file_content = output_file.read()
 
