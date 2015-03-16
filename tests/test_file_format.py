@@ -33,7 +33,7 @@ class FileFormatTestCase(unittest.TestCase):
         '''
         test_depends()
 
-    def test0010export_file(self):
+    def test0010export_csv_file(self):
         '''
         Test FileFormat.export_file.
         '''
@@ -48,9 +48,10 @@ class FileFormatTestCase(unittest.TestCase):
             temp_file.close()
 
             file_format = self.file_format()
-            file_format.name = 'File Format Test'
+            file_format.name = 'CSV File Format Test'
             file_format.path = os.path.dirname(temp_file.name)
             file_format.file_name = os.path.basename(temp_file.name)
+            file_format.file_type = 'csv'
             file_format.header = True
             file_format.separator = ','
             file_format.quote = '"'
@@ -94,6 +95,64 @@ class FileFormatTestCase(unittest.TestCase):
                     '"module","model","name","N. fields","N. fields 2"\r\n'
                     '"file_format","file.format","----File Format","14,00",'
                     '"14.00"\r\n'))
+            os.unlink(temp_file.name)
+
+    def test0010export_xml_file(self):
+        '''
+        Test FileFormat.export_file.
+        '''
+        with Transaction().start(DB_NAME, USER, context=CONTEXT):
+            model_model, = self.model.search([
+                    ('model', '=', 'ir.model'),
+                    ])
+            file_format_model, = self.model.search([
+                    ('model', '=', 'file.format'),
+                    ])
+            temp_file = tempfile.NamedTemporaryFile()
+            temp_file.close()
+
+            file_format = self.file_format()
+            file_format.name = 'XML File Format Test'
+            file_format.path = os.path.dirname(temp_file.name)
+            file_format.file_name = os.path.basename(temp_file.name)
+            file_format.file_type = 'xml'
+
+            file_format.xml_format = """
+                <?xml version="1.0" encoding="utf-8"?>
+                <OpenShipments xmlns="x-schema:OpenShipments.xdr">
+                    <OpenShipment ShipmentOption="" ProcessStatus="">
+                        <ShipTo>
+                            <CompanyOrName>Company TEST</CompanyOrName>
+                        </ShipTo>
+                        <ShipmentInformation>
+                            <ServiceType>ST</ServiceType>
+                            <NumberOfPackages>5</NumberOfPackages>
+                        </ShipmentInformation>
+                    </OpenShipment>
+                </OpenShipments>
+            """
+
+            file_format.save()
+
+            file_format.export_file([file_format_model.id])
+
+            with open(temp_file.name) as output_file:
+                file_content = output_file.read()
+
+            self.assertEqual(file_content, """
+                <?xml version="1.0" encoding="utf-8"?>
+                <OpenShipments xmlns="x-schema:OpenShipments.xdr">
+                    <OpenShipment ShipmentOption="" ProcessStatus="">
+                        <ShipTo>
+                            <CompanyOrName>Company TEST</CompanyOrName>
+                        </ShipTo>
+                        <ShipmentInformation>
+                            <ServiceType>ST</ServiceType>
+                            <NumberOfPackages>5</NumberOfPackages>
+                        </ShipmentInformation>
+                    </OpenShipment>
+                </OpenShipments>
+            """)
             os.unlink(temp_file.name)
 
 
