@@ -11,6 +11,8 @@ from trytond.pyson import Eval, Greater, Not
 from trytond.rpc import RPC
 from trytond.tools import safe_eval
 
+from jinja2 import Template as Jinja2Template
+
 
 __all__ = ['FileFormat', 'FileFormatField']
 
@@ -33,13 +35,29 @@ class FileFormat(ModelSQL, ModelView):
     path = fields.Char('Path', required=True,
         help='The path to the file name. The last slash is not necessary.')
     file_name = fields.Char('File Name', required=True)
-    header = fields.Boolean('Header', help='Header (fields name) on files.')
-    separator = fields.Char('Separator', size=1,
-        help='Put here, if it\'s necessary, the separator between each field.')
-    quote = fields.Char('Quote', size=1,
-        help='Character to use as quote.')
+    file_type = fields.Selection([
+            ('csv', 'CSV'),
+            ('xml', 'XML'),
+            ], 'File Type', required=True,
+        help='Choose type of file that will be generated')
+    header = fields.Boolean('Header', states = {
+            'invisible': Eval('file_type') != 'csv',
+        }, depends=['file_type'], help='Header (fields name) on files.')
+    separator = fields.Char('Separator', size=1, states = {
+            'invisible': Eval('file_type') == 'xml',
+        }, depends=['file_type'], help=('Put here, if it\'s necessary, '
+            'the separator between each field.'))
+    quote = fields.Char('Quote', size=1, states = {
+            'invisible': Eval('file_type') != 'csv',
+        }, depends=['file_type'], help='Character to use as quote.')
     model = fields.Many2One('ir.model', 'Model', required=True)
-    fields = fields.One2Many('file.format.field', 'format', 'Fields')
+    xml_format = fields.Text('XML Format', states = {
+            'invisible': Eval('file_type') != 'xml',
+        }, depends=['file_type'])
+    fields = fields.One2Many('file.format.field', 'format', 'Fields',
+        states = {
+            'invisible': Eval('file_type') != 'csv',
+        }, depends=['file_type'])
 
     @classmethod
     def __setup__(cls):
@@ -54,6 +72,8 @@ class FileFormat(ModelSQL, ModelView):
                 'doesn\'t have enough permissions over the Path "%(path)s" of '
                 'File Format "%(file_format)s".\n'
                 'Please, contact with your server administrator.'),
+            'file_type_not_exisit': ('This file type "%/file_type)s" selected '
+                'in file format "%(file_format)s" dosen\'t exist.'),
             })
 
     @staticmethod
@@ -63,6 +83,14 @@ class FileFormat(ModelSQL, ModelView):
     @staticmethod
     def default_separator():
         return ''
+
+    @staticmethod
+    def default_file_type():
+        return 'csv'
+
+    @staticmethod
+    def default_xml_format():
+        return '<?xml version="1.0" encoding="utf-8"?>\n'
 
     @classmethod
     def validate(cls, file_formats):
@@ -92,6 +120,17 @@ class FileFormat(ModelSQL, ModelView):
             }
 
     def export_file(self, instance_ids):
+        if self.file_type == 'csv':
+            self.export_csv(instance_ids)
+        elif self.file_type == 'xml':
+            self.export_xml(instance_ids)
+        else:
+            self.raise_user_error('file_type_not_exisit', {
+                    'file_type': self.file_type,
+                    'file_format': self.name,
+                    })
+
+    def export_csv(self, instance_ids):
         pool = Pool()
         Model = pool.get(self.model.model)
 
@@ -173,6 +212,21 @@ class FileFormat(ModelSQL, ModelView):
         except:
             pass
 
+    def export_xml(self, instance_ids):
+        pool = Pool()
+        Model = pool.get(self.model.model)
+
+        for instance in Model.browse(instance_ids):
+            template = Jinja2Template(self.xml_format)
+            xml = template.render({'record': instance}).encode('utf-8')
+            try:
+                file_path = self.path + "/" + str(instance.id) + self.file_name
+                with open(file_path, 'w') as output_file:
+                    output_file.write(xml)
+                logging.getLogger('file.format').info('The file "%s" is write '
+                    'correctly' % self.file_name)
+            except:
+                pass
 
 class FileFormatField(ModelSQL, ModelView):
     '''File Format Field'''

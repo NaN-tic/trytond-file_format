@@ -6,6 +6,7 @@
     <field name="path"/>
     <field name="file_name"/>
     <field name="model"/>
+    <field name="file_type"/>
     <field name="header"/>
     <field name="separator"/>
     <field name="quote"/>
