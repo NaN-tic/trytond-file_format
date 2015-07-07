@@ -192,7 +192,7 @@ msgid ""
 "E.g: if you have a float and want 2 decimals, write here \"%.2f\" (without quotes)."
 msgstr ""
 "Expresión para formatear cómo cadena de carácteres un campo numèrico.\n"
-"P.g: Si tienes un número decimal i se quieren 2 decimales, escribe aquí \"%.2f\" (sin comillas)"
+"P.g: Si tienes un número decimal y se quieren 2 decimales, escribe aquí \"%.2f\" (sin comillas)"
 
 msgctxt "help:file.format.field,sequence:"
 msgid "The order that you want for the field's column in the file."
