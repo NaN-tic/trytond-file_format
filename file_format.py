@@ -4,12 +4,12 @@ import logging
 import os.path
 import traceback
 import unicodedata
+from simpleeval import simple_eval
 
 from trytond.model import ModelSQL, ModelView, fields
 from trytond.pool import Pool
 from trytond.pyson import Eval, Greater, Not
 from trytond.rpc import RPC
-from trytond.tools import safe_eval
 
 from jinja2 import Template as Jinja2Template
 
@@ -108,6 +108,12 @@ class FileFormat(ModelSQL, ModelView):
         cls.check_file_path(file_formats)
 
     @classmethod
+    def view_attributes(cls):
+        return [('/form/notebook/page[@id="csv_fields"]', 'states', {
+                    'invisible': Eval('file_type') != 'csv',
+                    })]
+
+    @classmethod
     def check_file_path(cls, file_formats):
         for file_format in file_formats:
             if not file_format.path or file_format.state == 'disabled':
@@ -126,7 +132,7 @@ class FileFormat(ModelSQL, ModelView):
 
     @property
     def eval_context(self):
-        'Returns the context used for safe_eval'
+        'Returns the context used for simple_eval'
         return {
             'len': len,
             }
@@ -156,8 +162,8 @@ class FileFormat(ModelSQL, ModelView):
             for field in self.fields:
                 try:
                     if field and field.expression:
-                        field_eval = safe_eval(field.expression.replace('$',
-                                'instance.'), eval_context)
+                        field_eval = simple_eval(field.expression.replace('$',
+                                'instance.'), **eval_context)
                     else:
                         field_eval = ''
                 except:

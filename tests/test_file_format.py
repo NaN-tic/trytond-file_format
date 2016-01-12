@@ -5,33 +5,22 @@ import os.path
 import tempfile
 import unittest
 import trytond.tests.test_tryton
-from trytond.tests.test_tryton import POOL, DB_NAME, USER, CONTEXT, test_view,\
-    test_depends
+from trytond.tests.test_tryton import POOL, DB_NAME, USER, CONTEXT
+from trytond.tests.test_tryton import ModuleTestCase
 from trytond.transaction import Transaction
 
 
-class FileFormatTestCase(unittest.TestCase):
+class FileFormatTestCase(ModuleTestCase):
     '''
     Test File Format module.
     '''
+    module = 'file_format'
 
     def setUp(self):
-        trytond.tests.test_tryton.install_module('file_format')
+        super(FileFormatTestCase, self).setUp()
         self.model = POOL.get('ir.model')
         self.file_format = POOL.get('file.format')
         self.file_format_field = POOL.get('file.format.field')
-
-    def test0005views(self):
-        '''
-        Test views.
-        '''
-        test_view('file_format')
-
-    def test0006depends(self):
-        '''
-        Test depends.
-        '''
-        test_depends()
 
     def test0010export_csv_file(self):
         '''
@@ -57,10 +46,10 @@ class FileFormatTestCase(unittest.TestCase):
             file_format.quote = '"'
             file_format.model = model_model
 
-            file_format.fields = []
+            fields = []
             for i, fieldname in enumerate(('module', 'model', 'name')):
                 field = self.file_format_field()
-                file_format.fields.append(field)
+                fields.append(field)
                 field.name = fieldname
                 field.sequence = i
                 field.expression = '$%s' % fieldname
@@ -70,7 +59,7 @@ class FileFormatTestCase(unittest.TestCase):
                     field.align = 'right'
 
             field = self.file_format_field()
-            file_format.fields.append(field)
+            fields.append(field)
             field.name = 'N. fields'
             field.sequence = i + 1
             field.expression = 'len($fields)'
@@ -78,11 +67,13 @@ class FileFormatTestCase(unittest.TestCase):
             field.decimal_character = ','
 
             field = self.file_format_field()
-            file_format.fields.append(field)
+            fields.append(field)
             field.name = 'N. fields 2'
             field.sequence = i + 2
             field.expression = 'len($fields)'
             field.number_format = '%.2f'
+
+            file_format.fields = fields
 
             file_format.save()
 
