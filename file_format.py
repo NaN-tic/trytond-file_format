@@ -34,7 +34,7 @@ class FileFormat(ModelSQL, ModelView):
     name = fields.Char('Name', required=True, select=True)
     path = fields.Char('Path', states={
             'required': Eval('state') == 'active',
-        }, depends=['state'],
+            }, depends=['state'],
         help='The path to the file name. The last slash is not necessary.')
     file_name = fields.Char('File Name', required=True)
     file_type = fields.Selection([
@@ -42,26 +42,26 @@ class FileFormat(ModelSQL, ModelView):
             ('xml', 'XML'),
             ], 'File Type', required=True,
         help='Choose type of file that will be generated')
-    header = fields.Boolean('Header', states = {
+    header = fields.Boolean('Header', states={
             'invisible': Eval('file_type') != 'csv',
-        }, depends=['file_type'], help='Header (fields name) on files.')
-    separator = fields.Char('Separator', size=1, states = {
+            }, depends=['file_type'], help='Header (fields name) on files.')
+    separator = fields.Char('Separator', size=1, states={
             'invisible': Eval('file_type') == 'xml',
-        }, depends=['file_type'], help=('Put here, if it\'s necessary, '
+            }, depends=['file_type'], help=('Put here, if it\'s necessary, '
             'the separator between each field.'))
-    quote = fields.Char('Quote', size=1, states = {
+    quote = fields.Char('Quote', size=1, states={
             'invisible': Eval('file_type') != 'csv',
-        }, depends=['file_type'], help='Character to use as quote.')
+            }, depends=['file_type'], help='Character to use as quote.')
     model = fields.Many2One('ir.model', 'Model', required=True)
-    xml_format = fields.Text('XML Format', states = {
+    xml_format = fields.Text('XML Format', states={
             'invisible': Eval('file_type') != 'xml',
-        }, depends=['file_type'])
+            }, depends=['file_type'])
     state = fields.Selection([
             ('active', 'Active'),
             ('disabled', 'Disabled'),
             ], 'State', required=True, select=True)
     fields = fields.One2Many('file.format.field', 'format', 'Fields',
-        states = {
+        states={
             'invisible': Eval('file_type') != 'csv',
         }, depends=['file_type'])
 
@@ -245,6 +245,7 @@ class FileFormat(ModelSQL, ModelView):
                     'correctly' % self.file_name)
             except:
                 pass
+
 
 class FileFormatField(ModelSQL, ModelView):
     '''File Format Field'''
