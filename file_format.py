@@ -165,8 +165,6 @@ class FileFormat(ModelSQL, ModelView):
                         if 'len' in field.expression:
                             expression = field.expression.replace('$',
                                 'instance("').replace(')', '"))')
-                            import pdb
-                            pdb.set_trace()
                         else:
                             expression = field.expression.replace('$',
                                 'instance("') + '")'
