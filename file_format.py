@@ -158,12 +158,20 @@ class FileFormat(ModelSQL, ModelView):
             fields = []
             headers = []
             eval_context = self.eval_context.copy()
-            eval_context.update({'instance': instance})
+            eval_context.update({'instance': instance.__getattr__})
             for field in self.fields:
                 try:
                     if field and field.expression:
-                        field_eval = simple_eval(field.expression.replace('$',
-                                'instance.'), **eval_context)
+                        if 'len' in field.expression:
+                            expression = field.expression.replace('$',
+                                'instance("').replace(')', '"))')
+                            import pdb
+                            pdb.set_trace()
+                        else:
+                            expression = field.expression.replace('$',
+                                'instance("') + '")'
+                        field_eval = simple_eval(expression,
+                            functions=eval_context)
                     else:
                         field_eval = ''
                 except:
