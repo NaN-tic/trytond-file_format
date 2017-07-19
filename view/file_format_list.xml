@@ -11,5 +11,5 @@
     <field name="separator"/>
     <field name="quote"/>
     <field name="state"/>
-    <field name="fields"/>
+    <field name="ffields"/>
 </tree>

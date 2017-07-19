@@ -1,22 +1,22 @@
 <?xml version="1.0"?>
 <!-- The COPYRIGHT file at the top level of this repository contains the full
      copyright notices and license terms. -->
-<form string="File Format">
-    <group id="main_file_info" colspan="4" col="6">
-        <label name="name"/>
-        <field name="name"/>
-        <label name="model"/>
-        <field name="model"/>
-        <label name="file_type"/>
-        <field name="file_type"/>
-    </group>
+<form string="File Format" col="6">
+    <label name="name"/>
+    <field name="name"/>
+    <label name="model"/>
+    <field name="model"/>
+    <label name="file_type"/>
+    <field name="file_type"/>
+    <label name="engine"/>
+    <field name="engine"/>
     <label name="path"/>
     <field name="path"/>
     <label name="file_name"/>
     <field name="file_name"/>
     <label name="state"/>
     <field name="state"/>
-    <notebook colspan="4">
+    <notebook colspan="6">
         <page string="CSV" id="csv_fields">
             <group id="flag_fields" colspan="4" col="6">
                 <label name="header"/>
@@ -26,7 +26,7 @@
                 <label name="quote"/>
                 <field name="quote"/>
             </group>
-            <field name="fields" colspan="4"/>
+            <field name="ffields" colspan="4"/>
         </page>
         <page string="XML" name="xml_format">
             <field name="xml_format"/>
