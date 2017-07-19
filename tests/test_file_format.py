@@ -27,66 +27,69 @@ class FileFormatTestCase(ModuleTestCase):
         Test FileFormat.export_csv_file.
         '''
         with Transaction().start(DB_NAME, USER, context=CONTEXT):
-            model_model, = self.model.search([
-                    ('model', '=', 'ir.model'),
-                    ])
-            file_format_model, = self.model.search([
-                    ('model', '=', 'file.format'),
-                    ])
-            temp_file = tempfile.NamedTemporaryFile()
-            temp_file.close()
+		    pool = Pool()
+		    Model = pool.get('ir.model')
+		    FileFormat = pool.get('file.format')
+		    FileFormatField = pool.get('file.format.field')
 
-            file_format = self.file_format()
-            file_format.name = 'CSV File Format Test'
-            file_format.path = os.path.dirname(temp_file.name)
-            file_format.file_name = os.path.basename(temp_file.name)
-            file_format.file_type = 'csv'
-            file_format.header = True
-            file_format.separator = ','
-            file_format.quote = '"'
-            file_format.model = model_model
+		    model_model, = Model.search([
+		            ('model', '=', 'ir.model'),
+		            ])
+		    file_format_model, = Model.search([
+		            ('model', '=', 'file.format'),
+		            ])
+		    temp_file = tempfile.NamedTemporaryFile()
+		    temp_file.close()
 
-            fields = []
-            for i, fieldname in enumerate(('module', 'model', 'name')):
-                field = self.file_format_field()
-                fields.append(field)
-                field.name = fieldname
-                field.sequence = i
-                field.expression = '$%s' % fieldname
-                if fieldname == 'name':
-                    field.length = 15
-                    field.fill_character = '-'
-                    field.align = 'right'
+		    file_format = FileFormat()
+		    file_format.name = 'CSV File Format Test'
+		    file_format.path = os.path.dirname(temp_file.name)
+		    file_format.file_name = os.path.basename(temp_file.name)
+		    file_format.file_type = 'csv'
+		    file_format.header = True
+		    file_format.separator = ','
+		    file_format.quote = '"'
+		    file_format.model = model_model
+		    file_format.save()
 
-            field = self.file_format_field()
-            fields.append(field)
-            field.name = 'N. fields'
-            field.sequence = i + 1
-            field.expression = 'len($fields)'
-            field.number_format = '%.2f'
-            field.decimal_character = ','
+		    for i, fieldname in enumerate(('module', 'model', 'name')):
+		        field = FileFormatField()
+		        field.format = file_format
+		        field.name = fieldname
+		        field.sequence = i
+		        field.expression = '{{ record.%s }}' % fieldname
+		        if fieldname == 'name':
+		            field.length = 15
+		            field.fill_character = '-'
+		            field.align = 'right'
+		        field.save()
 
-            field = self.file_format_field()
-            fields.append(field)
-            field.name = 'N. fields 2'
-            field.sequence = i + 2
-            field.expression = 'len($fields)'
-            field.number_format = '%.2f'
+		    field = FileFormatField()
+		    field.format = file_format
+		    field.name = 'Numero'
+		    field.sequence = i + 1
+		    field.expression = '12'
+		    field.number_format = '%.2f'
+		    field.save()
 
-            file_format.fields = fields
+		    field = FileFormatField()
+		    field.format = file_format
+		    field.name = 'Decimal'
+		    field.sequence = i + 2
+		    field.expression = '10.50'
+		    field.decimal_character = ','
+		    field.save()
 
-            file_format.save()
+		    file_format.export_file([file_format_model])
 
-            file_format.export_file([file_format_model.id])
+		    with open(temp_file.name) as output_file:
+		        file_content = output_file.read()
 
-            with open(temp_file.name) as output_file:
-                file_content = output_file.read()
-
-            self.assertEqual(file_content, (
-                    '"module","model","name","N. fields","N. fields 2"\r\n'
-                    '"file_format","file.format","----File Format","17,00",'
-                    '"17.00"\r\n'))
-            os.unlink(temp_file.name)
+		    self.assertEqual(file_content, (
+		            '"module","model","name","Numero","Decimal"\r\n'
+		            '"file_format","file.format","----File Format","12.00",'
+		            '"10,50"\r\n'))
+		    os.unlink(temp_file.name)
 
     def test0010export_xml_file(self):
         '''
