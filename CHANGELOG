@@ -1,5 +1,7 @@
 * Replace simple_eval to jinja2, genshi or eval
 
+Version 4.0.0 - 2016-06-30
+
 Version 3.8.0 - 2015-12-09
 * Add state field and remove harcoded path in templates.
 
