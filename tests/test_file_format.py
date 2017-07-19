@@ -11,9 +11,7 @@ from trytond.pool import Pool
 
 
 class FileFormatTestCase(ModuleTestCase):
-    '''
-    Test File Format module.
-    '''
+    'Test File Format module'
     module = 'file_format'
 
     @with_transaction()
@@ -44,47 +42,45 @@ class FileFormatTestCase(ModuleTestCase):
         file_format.separator = ','
         file_format.quote = '"'
         file_format.model = model_model
+        file_format.save()
 
-        fields = []
         for i, fieldname in enumerate(('module', 'model', 'name')):
             field = FileFormatField()
-            fields.append(field)
+            field.format = file_format
             field.name = fieldname
             field.sequence = i
-            field.expression = '$%s' % fieldname
+            field.expression = '{{ record.%s }}' % fieldname
             if fieldname == 'name':
                 field.length = 15
                 field.fill_character = '-'
                 field.align = 'right'
+            field.save()
 
         field = FileFormatField()
-        fields.append(field)
-        field.name = 'N. fields'
+        field.format = file_format
+        field.name = 'Numero'
         field.sequence = i + 1
-        field.expression = 'len($fields)'
+        field.expression = '12'
         field.number_format = '%.2f'
-        field.decimal_character = ','
+        field.save()
 
         field = FileFormatField()
-        fields.append(field)
-        field.name = 'N. fields 2'
+        field.format = file_format
+        field.name = 'Decimal'
         field.sequence = i + 2
-        field.expression = 'len($fields)'
-        field.number_format = '%.2f'
+        field.expression = '10.50'
+        field.decimal_character = ','
+        field.save()
 
-        file_format.fields = fields
-
-        file_format.save()
-
-        file_format.export_file([file_format_model.id])
+        file_format.export_file([file_format_model])
 
         with open(temp_file.name) as output_file:
             file_content = output_file.read()
 
         self.assertEqual(file_content, (
-                '"module","model","name","N. fields","N. fields 2"\r\n'
-                '"file_format","file.format","----File Format","17,00",'
-                '"17.00"\r\n'))
+                '"module","model","name","Numero","Decimal"\r\n'
+                '"file_format","file.format","----File Format","12.00",'
+                '"10,50"\r\n'))
         os.unlink(temp_file.name)
 
     @with_transaction()
@@ -111,13 +107,12 @@ class FileFormatTestCase(ModuleTestCase):
         file_format.file_name = os.path.basename(temp_file.name)
         file_format.file_type = 'xml'
         file_format.model = model_model
-
         file_format.xml_format = """
             <?xml version="1.0" encoding="utf-8"?>
             <OpenShipments xmlns="x-schema:OpenShipments.xdr">
                 <OpenShipment ShipmentOption="" ProcessStatus="">
                     <ShipTo>
-                        <CompanyOrName>Company TEST</CompanyOrName>
+                        <CompanyOrName>{{ record.name }}</CompanyOrName>
                     </ShipTo>
                     <ShipmentInformation>
                         <ServiceType>ST</ServiceType>
@@ -126,14 +121,14 @@ class FileFormatTestCase(ModuleTestCase):
                 </OpenShipment>
             </OpenShipments>
         """
-
         file_format.save()
 
-        file_format.export_file([file_format_model.id])
+        file_format.export_file([file_format_model])
 
-        temp_file.name = (file_format.path + "/" +
-            str(file_format_model.id) + file_format.file_name)
-        with open(temp_file.name) as output_file:
+        file_path = (os.path.dirname(temp_file.name) + "/"
+            + str(file_format_model.id) + os.path.basename(temp_file.name))
+
+        with open(file_path) as output_file:
             file_content = output_file.read()
 
         self.assertEqual(file_content, """
@@ -141,7 +136,7 @@ class FileFormatTestCase(ModuleTestCase):
             <OpenShipments xmlns="x-schema:OpenShipments.xdr">
                 <OpenShipment ShipmentOption="" ProcessStatus="">
                     <ShipTo>
-                        <CompanyOrName>Company TEST</CompanyOrName>
+                        <CompanyOrName>File Format</CompanyOrName>
                     </ShipTo>
                     <ShipmentInformation>
                         <ServiceType>ST</ServiceType>
@@ -150,7 +145,7 @@ class FileFormatTestCase(ModuleTestCase):
                 </OpenShipment>
             </OpenShipments>
         """)
-        os.unlink(temp_file.name)
+        os.unlink(file_path)
 
 
 def suite():

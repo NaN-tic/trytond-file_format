@@ -5,17 +5,23 @@ import os.path
 import traceback
 import unicodedata
 from simpleeval import simple_eval
-
 from trytond.model import ModelSQL, ModelView, fields
 from trytond.pool import Pool
 from trytond.pyson import Eval, Greater, Not
 from trytond.rpc import RPC
-
+from trytond.transaction import Transaction
+from genshi.template import TextTemplate
 from jinja2 import Template as Jinja2Template
 
 
 __all__ = ['FileFormat', 'FileFormatField']
 
+logger = logging.getLogger(__name__)
+_ENGINES = [
+    ('python', 'Python'),
+    ('genshi', 'Genshi'),
+    ('jinja2', 'Jinja2')
+    ]
 
 def unaccent(text):
     if isinstance(text, str):
@@ -60,10 +66,11 @@ class FileFormat(ModelSQL, ModelView):
             ('active', 'Active'),
             ('disabled', 'Disabled'),
             ], 'State', required=True, select=True)
-    fields = fields.One2Many('file.format.field', 'format', 'Fields',
+    ffields = fields.One2Many('file.format.field', 'format', 'Fields',
         states={
             'invisible': Eval('file_type') != 'csv',
         }, depends=['file_type'])
+    engine = fields.Selection(_ENGINES, 'Engine', required=True)
 
     @classmethod
     def __setup__(cls):
@@ -102,6 +109,10 @@ class FileFormat(ModelSQL, ModelView):
     def default_xml_format():
         return '<?xml version="1.0" encoding="utf-8"?>\n'
 
+    @staticmethod
+    def default_engine():
+        return 'jinja2'
+
     @classmethod
     def validate(cls, file_formats):
         super(FileFormat, cls).validate(file_formats)
@@ -130,63 +141,108 @@ class FileFormat(ModelSQL, ModelView):
                         'file_format': file_format.rec_name,
                         })
 
-    @property
-    def eval_context(self):
-        'Returns the context used for simple_eval'
+    @classmethod
+    def eval(cls, expression, record, engine='genshi'):
+        '''Evaluates the given :attr:expression
+
+        :param expression: Expression to evaluate
+        :param record: The browse record of the record
+        '''
+        engine_method = getattr(cls, '_engine_' + engine)
+        return engine_method(expression, record)
+
+    @staticmethod
+    def template_context(record):
+        """Generate the tempalte context
+
+        This is mainly to assist in the inheritance pattern
+        """
+        User = Pool().get('res.user')
+
+        user = None
+        if Transaction().user:
+            user = User(Transaction().user)
         return {
-            'len': len,
+            'record': record,
+            'user': user,
             }
 
-    def export_file(self, instance_ids):
+    @classmethod
+    def _engine_python(cls, expression, record):
+        '''Evaluate the pythonic expression and return its value
+        '''
+        if expression is None:
+            return u''
+
+        assert record is not None, 'Record is undefined'
+        template_context = cls.template_context(record)
+        return eval(expression, template_context)
+
+    @classmethod
+    def _engine_genshi(cls, expression, record):
+        '''
+        :param expression: Expression to evaluate
+        :param record: Browse record
+        '''
+        if not expression:
+            return u''
+
+        template = TextTemplate(expression)
+        template_context = cls.template_context(record)
+        return template.generate(**template_context).render(encoding='UTF-8')
+
+    @classmethod
+    def _engine_jinja2(cls, expression, record):
+        '''
+        :param expression: Expression to evaluate
+        :param record: Browse record
+        '''
+        if not expression:
+            return u''
+
+        template = Jinja2Template(expression)
+        template_context = cls.template_context(record)
+        return template.render(template_context).encode('utf-8')
+
+    def export_file(self, records):
         if self.file_type == 'csv':
-            self.export_csv(instance_ids)
+            self.export_csv(records)
         elif self.file_type == 'xml':
-            self.export_xml(instance_ids)
+            self.export_xml(records)
         else:
             self.raise_user_error('file_type_not_exisit', {
                     'file_type': self.file_type,
                     'file_format': self.name,
                     })
 
-    def export_csv(self, instance_ids):
-        pool = Pool()
-        Model = pool.get(self.model.model)
+    def export_csv(self, records):
+        Model = Pool().get(self.model.model)
+
+        path = self.path
+        if not path:
+            self.raise_user_error('path_not_exists', {
+                    'path': '',
+                    'file_format': self.rec_name,
+                    })
 
         header_line = []
         lines = []
-        for instance in Model.browse(instance_ids):
+        for record in records:
             fields = []
             headers = []
-            eval_context = self.eval_context.copy()
-            eval_context.update({'instance': instance.__getattr__})
-            for field in self.fields:
-                try:
-                    if field and field.expression:
-                        if 'len' in field.expression:
-                            expression = field.expression.replace('$',
-                                'instance("').replace(')', '"))')
-                        else:
-                            expression = field.expression.replace('$',
-                                'instance("') + '")'
-                        field_eval = simple_eval(expression,
-                            functions=eval_context)
-                    else:
-                        field_eval = ''
-                except:
-                    field_eval = ''
-                    logging.getLogger('file.format').warning('Exception '
-                        'evaluating expression of field %s (%s) from File '
-                        'Format %s (%s) for instance %s (%s):\n%s' % (
-                            field.rec_name, field.id, self.rec_name, self.id,
-                            instance.rec_name, instance.id,
-                            traceback.format_exc()))
-
-                if isinstance(field_eval, (int, float)):
+            for field in self.ffields:
+                if field and field.expression:
+                    field_eval = self.eval(field.expression, record, self.engine)
                     if field.number_format:
-                        field_eval = field.number_format % field_eval
+                        if field_eval.isdigit():
+                            field_eval = field.number_format % int(field_eval)
+                        else:
+                            field_eval = field.number_format % float(field_eval)
                     if field.decimal_character:
                         field_eval = str(field_eval).replace('.',
                             unaccent(field.decimal_character) or '')
+                else:
+                    field_eval = ''
 
                 ffield = unaccent(field_eval)
                 # If the length of the field is 0, it's means that dosen't
@@ -218,7 +274,7 @@ class FileFormat(ModelSQL, ModelView):
                 header_line.append(separator.join(headers))
 
         try:
-            file_path = self.path + "/" + self.file_name
+            file_path = path + "/" + self.file_name
             # Control if we need the headers + if the path file doesn't exists
             # and is a file. To add the headers or not
             if self.header and not os.path.isfile(file_path):
@@ -231,26 +287,29 @@ class FileFormat(ModelSQL, ModelView):
             with open(file_path, 'a+') as output_file:
                 for line in lines:
                     output_file.write(line + "\r\n")
-            logging.getLogger('file.format').info('The file "%s" is write '
-                'correctly' % self.file_name)
+            logger.info('The file "%s" is write correctly' % self.file_name)
         except:
-            pass
+            logger.error('Can not write file "%s" correctly' % self.file_name)
 
-    def export_xml(self, instance_ids):
-        pool = Pool()
-        Model = pool.get(self.model.model)
+    def export_xml(self, records):
+        Model = Pool().get(self.model.model)
 
-        for instance in Model.browse(instance_ids):
-            template = Jinja2Template(self.xml_format)
-            xml = template.render({'record': instance}).encode('utf-8')
+        path = self.path
+        if not path:
+            self.raise_user_error('path_not_exists', {
+                    'path': '',
+                    'file_format': self.rec_name,
+                    })
+
+        for record in records:
+            xml = self.eval(self.xml_format, record, self.engine)
             try:
-                file_path = self.path + "/" + str(instance.id) + self.file_name
+                file_path = path + "/" + str(record.id) + self.file_name
                 with open(file_path, 'w') as output_file:
                     output_file.write(xml)
-                logging.getLogger('file.format').info('The file "%s" is write '
-                    'correctly' % self.file_name)
+                logger.info('The file "%s" is write correctly' % self.file_name)
             except:
-                pass
+                logger.error('Can not write file "%s" correctly' % self.file_name)
 
 
 class FileFormatField(ModelSQL, ModelView):
