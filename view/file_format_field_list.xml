@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- The COPYRIGHT file at the top level of this repository contains the full
      copyright notices and license terms. -->
-<tree string="File Format Field" editable="bottom">
+<tree editable="bottom">
     <field name="format"/>
     <field name="sequence"/>
     <field name="name"/>

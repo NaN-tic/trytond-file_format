@@ -6,7 +6,6 @@ import tempfile
 import unittest
 import trytond.tests.test_tryton
 from trytond.tests.test_tryton import ModuleTestCase, with_transaction
-from trytond.transaction import Transaction
 from trytond.pool import Pool
 
 
@@ -74,13 +73,13 @@ class FileFormatTestCase(ModuleTestCase):
 
         file_format.export_file([file_format_model])
 
-        with open(temp_file.name) as output_file:
+        with open(temp_file.name, 'rb') as output_file:
             file_content = output_file.read()
 
         self.assertEqual(file_content, (
-                '"module","model","name","Numero","Decimal"\r\n'
-                '"file_format","file.format","----File Format","12.00",'
-                '"10,50"\r\n'))
+                b'"module","model","name","Numero","Decimal"\r\n'
+                b'"file_format","file.format","----File Format","12.00",'
+                b'"10,50"\r\n'))
         os.unlink(temp_file.name)
 
     @with_transaction()

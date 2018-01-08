@@ -2,9 +2,7 @@
 # copyright notices and license terms.
 import logging
 import os.path
-import traceback
 import unicodedata
-from simpleeval import simple_eval
 from trytond.model import ModelSQL, ModelView, fields
 from trytond.pool import Pool
 from trytond.pyson import Eval, Greater, Not
@@ -23,14 +21,17 @@ _ENGINES = [
     ('jinja2', 'Jinja2')
     ]
 
+
 def unaccent(text):
-    if isinstance(text, str):
+    if isinstance(text, bytes):
         text = unicode(text, 'utf-8')
     elif isinstance(text, unicode):
         pass
     else:
         return str(text)
-    return unicodedata.normalize('NFKD', text).encode('ASCII', 'ignore')
+    return (unicodedata.normalize('NFKD', text)
+        .encode('ascii', 'ignore')
+        .decode('ascii'))
 
 
 class FileFormat(ModelSQL, ModelView):
@@ -202,7 +203,7 @@ class FileFormat(ModelSQL, ModelView):
 
         template = Jinja2Template(expression)
         template_context = cls.template_context(record)
-        return template.render(template_context).encode('utf-8')
+        return template.render(template_context)
 
     def export_file(self, records):
         if self.file_type == 'csv':
@@ -216,8 +217,6 @@ class FileFormat(ModelSQL, ModelView):
                     })
 
     def export_csv(self, records):
-        Model = Pool().get(self.model.model)
-
         path = self.path
         if not path:
             self.raise_user_error('path_not_exists', {
@@ -232,12 +231,14 @@ class FileFormat(ModelSQL, ModelView):
             headers = []
             for field in self.ffields:
                 if field and field.expression:
-                    field_eval = self.eval(field.expression, record, self.engine)
+                    field_eval = self.eval(
+                        field.expression, record, self.engine)
                     if field.number_format:
                         if field_eval.isdigit():
                             field_eval = field.number_format % int(field_eval)
                         else:
-                            field_eval = field.number_format % float(field_eval)
+                            field_eval = (
+                                field.number_format % float(field_eval))
                     if field.decimal_character:
                         field_eval = str(field_eval).replace('.',
                             unaccent(field.decimal_character) or '')
@@ -292,8 +293,6 @@ class FileFormat(ModelSQL, ModelView):
             logger.error('Can not write file "%s" correctly' % self.file_name)
 
     def export_xml(self, records):
-        Model = Pool().get(self.model.model)
-
         path = self.path
         if not path:
             self.raise_user_error('path_not_exists', {
@@ -307,9 +306,11 @@ class FileFormat(ModelSQL, ModelView):
                 file_path = path + "/" + str(record.id) + self.file_name
                 with open(file_path, 'w') as output_file:
                     output_file.write(xml)
-                logger.info('The file "%s" is write correctly' % self.file_name)
+                logger.info(
+                    'The file "%s" is write correctly' % self.file_name)
             except:
-                logger.error('Can not write file "%s" correctly' % self.file_name)
+                logger.error(
+                    'Can not write file "%s" correctly' % self.file_name)
 
 
 class FileFormatField(ModelSQL, ModelView):

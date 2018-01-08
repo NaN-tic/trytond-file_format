@@ -1,11 +1,11 @@
 # The COPYRIGHT file at the top level of this repository contains the full
 # copyright notices and license terms.
 from trytond.pool import Pool
-from .file_format import *
+from . import file_format
 
 
 def register():
     Pool.register(
-        FileFormat,
-        FileFormatField,
+        file_format.FileFormat,
+        file_format.FileFormatField,
         module='file_format', type_='model')
