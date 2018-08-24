@@ -24,10 +24,8 @@ _ENGINES = [
 
 def unaccent(text):
     if isinstance(text, bytes):
-        text = unicode(text, 'utf-8')
-    elif isinstance(text, unicode):
-        pass
-    else:
+        text = str(text, 'utf-8')
+    elif not isinstance(text, str):
         return str(text)
     return (unicodedata.normalize('NFKD', text)
         .encode('ascii', 'ignore')
@@ -173,7 +171,7 @@ class FileFormat(ModelSQL, ModelView):
         '''Evaluate the pythonic expression and return its value
         '''
         if expression is None:
-            return u''
+            return ''
 
         assert record is not None, 'Record is undefined'
         template_context = cls.template_context(record)
@@ -186,7 +184,7 @@ class FileFormat(ModelSQL, ModelView):
         :param record: Browse record
         '''
         if not expression:
-            return u''
+            return ''
 
         template = TextTemplate(expression)
         template_context = cls.template_context(record)
@@ -199,7 +197,7 @@ class FileFormat(ModelSQL, ModelView):
         :param record: Browse record
         '''
         if not expression:
-            return u''
+            return ''
 
         template = Jinja2Template(expression)
         template_context = cls.template_context(record)
