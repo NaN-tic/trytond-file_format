@@ -285,10 +285,10 @@ class FileFormat(ModelSQL, ModelView):
     def export_xml(self, records):
         path = self.path
         if not path:
-            self.raise_user_error('path_not_exists', {
-                    'path': '',
-                    'file_format': self.rec_name,
-                    })
+            raise UserError(gettext('file_format.msg_path_not_exists',
+                path='',
+                file_format=self.rec_name,
+                ))
 
         for record in records:
             xml = self.eval(self.xml_format, record, self.engine)
