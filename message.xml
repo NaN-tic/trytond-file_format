@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!-- This file is part of Tryton.  The COPYRIGHT file at the top level of
+this repository contains the full copyright notices and license terms. -->
+<tryton>
+    <data group="1">
+        <record model="ir.message" id="msg_path_not_exists">
+            <field name="text">The Path "%(path)s" of File Format "%(file_format)s" doesn't exists.</field>
+        </record>
+        <record model="ir.message" id="msg_path_no_permission">
+            <field name="text">The Tryton server user doesn't have enough permissions over the Path "%(path)s" of File Format "%(file_format)s".
+Please, contact with your server administrator.</field>
+        </record>
+        <record model="ir.message" id="msg_file_type_not_exisit">
+            <field name="text">This file type "%(file_type)s" selected in file format "%(file_format)s" dosen\'t exist.</field>
+        </record>
+    </data>
+</tryton>

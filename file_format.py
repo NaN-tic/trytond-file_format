@@ -6,6 +6,8 @@ import unicodedata
 from trytond.model import ModelSQL, ModelView, fields
 from trytond.pool import Pool
 from trytond.pyson import Eval, Greater, Not
+from trytond.i18n import gettext
+from trytond.exceptions import UserError
 from trytond.rpc import RPC
 from trytond.transaction import Transaction
 from genshi.template import TextTemplate
@@ -77,16 +79,6 @@ class FileFormat(ModelSQL, ModelView):
         cls.__rpc__.update({
                 'export_file': RPC(instantiate=0),
                 })
-        cls._error_messages.update({
-            'path_not_exists': ('The Path "%(path)s" of File Format '
-                '"%(file_format)s" doesn\'t exists.'),
-            'path_no_permission': ('The Tryton server user '
-                'doesn\'t have enough permissions over the Path "%(path)s" of '
-                'File Format "%(file_format)s".\n'
-                'Please, contact with your server administrator.'),
-            'file_type_not_exisit': ('This file type "%/file_type)s" selected '
-                'in file format "%(file_format)s" dosen\'t exist.'),
-            })
 
     @staticmethod
     def default_quote():
@@ -129,16 +121,16 @@ class FileFormat(ModelSQL, ModelView):
             if not file_format.path or file_format.state == 'disabled':
                 continue
             if not os.path.isdir(file_format.path):
-                cls.raise_user_error('path_not_exists', {
-                        'path': file_format.path,
-                        'file_format': file_format.rec_name,
-                        })
+                raise UserError(gettext('file_format.msg_path_not_exists',
+                    path=file_format.path,
+                    file_format=file_format.rec_name,
+                    ))
             if (not os.access(file_format.path, os.R_OK)
                     or not os.access(file_format.path, os.W_OK)):
-                cls.raise_user_error('path_no_permission', {
-                        'path': file_format.path,
-                        'file_format': file_format.rec_name,
-                        })
+                raise UserError(gettext('file_format.msg_path_no_permission',
+                    path=file_format.path,
+                    file_format=file_format.rec_name,
+                    ))
 
     @classmethod
     def eval(cls, expression, record, engine='genshi'):
@@ -209,18 +201,18 @@ class FileFormat(ModelSQL, ModelView):
         elif self.file_type == 'xml':
             self.export_xml(records)
         else:
-            self.raise_user_error('file_type_not_exisit', {
-                    'file_type': self.file_type,
-                    'file_format': self.name,
-                    })
+            raise UserError(gettext('file_format.msg_file_type_not_exisit',
+                file_type=self.file_type,
+                file_format=self.name,
+                ))
 
     def export_csv(self, records):
         path = self.path
         if not path:
-            self.raise_user_error('path_not_exists', {
-                    'path': '',
-                    'file_format': self.rec_name,
-                    })
+            raise UserError(gettext('file_format.msg_path_not_exists',
+                path='',
+                file_format=self.rec_name,
+                ))
 
         header_line = []
         lines = []
