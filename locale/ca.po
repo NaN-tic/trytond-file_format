@@ -1,18 +1,6 @@
-# 
+#
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
-
-msgctxt "error:file.format:"
-msgid "The Path \"%(path)s\" of File Format \"%(file_format)s\" doesn't exists."
-msgstr "La ruta \"%(path)s\" pel format de fitxer \"%(file_format)s\" no existeix."
-
-msgctxt "error:file.format:"
-msgid ""
-"The Tryton server user doesn't have enough permissions over the Path \"%(path)s\" of File Format \"%(file_format)s\".\n"
-"Please, contact with your server administrator."
-msgstr ""
-"L'usuari del servidor Tryton no té permisos suficient sobre el directori \"%(path)s\" utilitzat pel format de fitxers \"%(file_format)s\".\n"
-"Si us plau, contacti amb l'administrador del servidor."
 
 msgctxt "field:file.format,create_date:"
 msgid "Create Date"
@@ -36,7 +24,7 @@ msgstr "Capçalera"
 
 msgctxt "field:file.format,id:"
 msgid "ID"
-msgstr "Identificador"
+msgstr "ID"
 
 msgctxt "field:file.format,model:"
 msgid "Model"
@@ -100,7 +88,7 @@ msgstr "Format"
 
 msgctxt "field:file.format.field,id:"
 msgid "ID"
-msgstr "Identificador"
+msgstr "ID"
 
 msgctxt "field:file.format.field,length:"
 msgid "Length"
@@ -209,6 +197,18 @@ msgstr "Format fitxer"
 msgctxt "model:ir.action,name:act_file_format_field"
 msgid "File Format Field"
 msgstr "Camp format fitxer"
+
+msgctxt "model:ir.message,text:msg_path_not_exists"
+msgid "The Path \"%(path)s\" of File Format \"%(file_format)s\" doesn't exists."
+msgstr "La ruta \"%(path)s\" pel format de fitxer \"%(file_format)s\" no existeix."
+
+msgctxt "model:ir.message,text:msg_path_no_permission"
+msgid ""
+"The Tryton server user doesn't have enough permissions over the Path \"%(path)s\" of File Format \"%(file_format)s\".\n"
+"Please, contact with your server administrator."
+msgstr ""
+"L'usuari del servidor Tryton no té permisos suficient sobre el directori \"%(path)s\" utilitzat pel format de fitxers \"%(file_format)s\".\n"
+"Si us plau, contacti amb l'administrador del servidor."
 
 msgctxt "model:ir.ui.menu,name:menu_file_format"
 msgid "File Format"

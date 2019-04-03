@@ -1,19 +1,6 @@
-# 
+#
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
-
-msgctxt "error:file.format:"
-msgid "The Path \"%(path)s\" of File Format \"%(file_format)s\" doesn't exists."
-msgstr "La ruta \"%(path)s\" del Formato de fichero \"%(file_format)s\" no existe."
-
-msgctxt "error:file.format:"
-msgid ""
-"The Tryton server user doesn't have enough permissions over the Path \"%(path)s\" of File Format \"%(file_format)s\".\n"
-"Please, contact with your server administrator."
-msgstr ""
-"El servidor de tryton no tiene suficiente permisos para acceder a la ruta "
-"\"%(path)s\" del formato de fichero \"%(file_format)s\". Por favor, pongase "
-"en contacto con el administrador del sistema. "
 
 msgctxt "field:file.format,create_date:"
 msgid "Create Date"
@@ -37,7 +24,7 @@ msgstr "Cabecera"
 
 msgctxt "field:file.format,id:"
 msgid "ID"
-msgstr "Identificador"
+msgstr "ID"
 
 msgctxt "field:file.format,model:"
 msgid "Model"
@@ -101,7 +88,7 @@ msgstr "Formato"
 
 msgctxt "field:file.format.field,id:"
 msgid "ID"
-msgstr "Identificador"
+msgstr "ID"
 
 msgctxt "field:file.format.field,length:"
 msgid "Length"
@@ -213,6 +200,19 @@ msgstr "Formato fichero"
 msgctxt "model:ir.action,name:act_file_format_field"
 msgid "File Format Field"
 msgstr "Campo de formato de fichero"
+
+msgctxt "model:ir.message,text:msg_path_not_exists"
+msgid "The Path \"%(path)s\" of File Format \"%(file_format)s\" doesn't exists."
+msgstr "La ruta \"%(path)s\" del Formato de fichero \"%(file_format)s\" no existe."
+
+msgctxt "model:ir.message,text:msg_path_no_permission"
+msgid ""
+"The Tryton server user doesn't have enough permissions over the Path \"%(path)s\" of File Format \"%(file_format)s\".\n"
+"Please, contact with your server administrator."
+msgstr ""
+"El servidor de tryton no tiene suficiente permisos para acceder a la ruta "
+"\"%(path)s\" del formato de fichero \"%(file_format)s\". Por favor, pongase "
+"en contacto con el administrador del sistema. "
 
 msgctxt "model:ir.ui.menu,name:menu_file_format"
 msgid "File Format"
