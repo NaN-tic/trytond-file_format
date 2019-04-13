@@ -12,12 +12,6 @@
             <field name="user" ref="res.user_admin"/>
             <field name="group" ref="group_file_format_admin"/>
         </record>
-        <record model="res.user-res.group"
-            id="user_trigger_group_file_format_admin">
-            <field name="user" ref="res.user_trigger"/>
-            <field name="group" ref="group_file_format_admin"/>
-        </record>
-
         <!-- file.format -->
         <record model="ir.ui.view" id="file_format_view_form">
             <field name="model">file.format</field>
