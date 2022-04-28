@@ -1,16 +1,15 @@
-#!/usr/bin/env python
-# The COPYRIGHT file at the top level of this repository contains the full
-# copyright notices and license terms.
+
+# This file is part of Tryton.  The COPYRIGHT file at the top level of
+# this repository contains the full copyright notices and license terms.
+
 import os.path
 import tempfile
-import unittest
-import trytond.tests.test_tryton
 from trytond.tests.test_tryton import ModuleTestCase, with_transaction
 from trytond.pool import Pool
 
 
 class FileFormatTestCase(ModuleTestCase):
-    'Test File Format module'
+    'Test FileFormat module'
     module = 'file_format'
 
     @with_transaction()
@@ -147,8 +146,4 @@ class FileFormatTestCase(ModuleTestCase):
         os.unlink(file_path)
 
 
-def suite():
-    suite = trytond.tests.test_tryton.suite()
-    suite.addTests(
-        unittest.TestLoader().loadTestsFromTestCase(FileFormatTestCase))
-    return suite
+del ModuleTestCase
