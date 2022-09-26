@@ -315,7 +315,7 @@ class FileFormatField(ModelSQL, ModelView):
         help='The order that you want for the field\'s column in the file.')
     length = fields.Integer('Length',
         help='Set 0 if there isn\'t any required length for the field.')
-    fill_character = fields.Char('Fill Char', size=1, states={
+    fill_character = fields.Char('Fill Char', size=1, strip=False, states={
             'required': Greater(Eval('length', 0), 0),
             'readonly': Not(Greater(Eval('length', 0), 0)),
             }, depends=['length'],
