@@ -38,7 +38,7 @@ class FileFormat(ModelSQL, ModelView):
     '''File Format'''
     __name__ = 'file.format'
 
-    name = fields.Char('Name', required=True, select=True)
+    name = fields.Char('Name', required=True)
     path = fields.Char('Path', states={
             'required': Eval('state') == 'active',
             }, depends=['state'],
@@ -66,7 +66,7 @@ class FileFormat(ModelSQL, ModelView):
     state = fields.Selection([
             ('active', 'Active'),
             ('disabled', 'Disabled'),
-            ], 'State', required=True, select=True)
+            ], 'State', required=True)
     ffields = fields.One2Many('file.format.field', 'format', 'Fields',
         states={
             'invisible': Eval('file_type') != 'csv',
@@ -307,8 +307,8 @@ class FileFormatField(ModelSQL, ModelView):
     '''File Format Field'''
     __name__ = 'file.format.field'
     format = fields.Many2One('file.format', 'Format', required=True,
-        select=True, ondelete='CASCADE')
-    name = fields.Char('Name', size=None, required=True, select=True,
+        ondelete='CASCADE')
+    name = fields.Char('Name', size=None, required=True,
         help='The name of the field. It\'s used if you have selected the '
         'Header checkbox.')
     sequence = fields.Integer('Sequence', required=True,
