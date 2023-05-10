@@ -178,7 +178,7 @@ msgid ""
 "Expression to format as string an integer or float field.\n"
 "E.g: if you have a float and want 2 decimals, write here \"%.2f\" (without quotes)."
 msgstr ""
-"Expresión para formatear cómo cadena de carácteres un campo numèrico.\n"
+"Expresión para formatear cómo cadena de carácteres un campo numérico.\n"
 "P.g: Si tienes un número decimal y se quieren 2 decimales, escribe aquí \"%.2f\" (sin comillas)"
 
 msgctxt "help:file.format.field,sequence:"
