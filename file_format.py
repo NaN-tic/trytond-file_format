@@ -41,7 +41,7 @@ class FileFormat(ModelSQL, ModelView):
     name = fields.Char('Name', required=True)
     path = fields.Char('Path', states={
             'required': Eval('state') == 'active',
-            }, depends=['state'],
+            },
         help='The path to the file name. The last slash is not necessary.')
     file_name = fields.Char('File Name', required=True)
     file_type = fields.Selection([
@@ -51,18 +51,18 @@ class FileFormat(ModelSQL, ModelView):
         help='Choose type of file that will be generated')
     header = fields.Boolean('Header', states={
             'invisible': Eval('file_type') != 'csv',
-            }, depends=['file_type'], help='Header (fields name) on files.')
+            }, help='Header (fields name) on files.')
     separator = fields.Char('Separator', size=1, states={
             'invisible': Eval('file_type') == 'xml',
-            }, depends=['file_type'], help=('Put here, if it\'s necessary, '
+            }, help=('Put here, if it\'s necessary, '
             'the separator between each field.'))
     quote = fields.Char('Quote', size=1, states={
             'invisible': Eval('file_type') != 'csv',
-            }, depends=['file_type'], help='Character to use as quote.')
+            }, help='Character to use as quote.')
     model = fields.Many2One('ir.model', 'Model', required=True)
     xml_format = fields.Text('XML Format', states={
             'invisible': Eval('file_type') != 'xml',
-            }, depends=['file_type'])
+            })
     state = fields.Selection([
             ('active', 'Active'),
             ('disabled', 'Disabled'),
@@ -70,7 +70,7 @@ class FileFormat(ModelSQL, ModelView):
     ffields = fields.One2Many('file.format.field', 'format', 'Fields',
         states={
             'invisible': Eval('file_type') != 'csv',
-        }, depends=['file_type'])
+        })
     engine = fields.Selection(_ENGINES, 'Engine', required=True)
 
     @classmethod
@@ -318,7 +318,7 @@ class FileFormatField(ModelSQL, ModelView):
     fill_character = fields.Char('Fill Char', size=1, strip=False, states={
             'required': Greater(Eval('length', 0), 0),
             'readonly': Not(Greater(Eval('length', 0), 0)),
-            }, depends=['length'],
+            },
         help='If you set a specific length, this character will be used to '
         'fill the field until the specified length.')
     align = fields.Selection([
@@ -328,7 +328,7 @@ class FileFormatField(ModelSQL, ModelView):
             ], 'Align',
         states={
             'readonly': Not(Greater(Eval('length', 0), 0)),
-            }, depends=['length'],
+            },
         help='If you set a specific length, you can decid the alignment of '
         'the value.')
     number_format = fields.Char('Number Format',
