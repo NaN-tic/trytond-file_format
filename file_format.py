@@ -39,9 +39,15 @@ class FileFormat(ModelSQL, ModelView):
     __name__ = 'file.format'
 
     name = fields.Char('Name', required=True)
+    storage_type = fields.Selection([
+            ('disk', 'Disk'),
+            ('memory', 'Memory'),
+            ], 'Storage Type', required=True,
+        help='Choose type of storage.')
     path = fields.Char('Path', states={
-            'required': Eval('state') == 'active',
-            },
+            'required': ((Eval('state') == 'active')
+                & (Eval('storage_type') == 'disk')),
+            }, depends=['state'],
         help='The path to the file name. The last slash is not necessary.')
     file_name = fields.Char('File Name', required=True)
     file_type = fields.Selection([
@@ -79,6 +85,10 @@ class FileFormat(ModelSQL, ModelView):
         cls.__rpc__.update({
                 'export_file': RPC(instantiate=0),
                 })
+
+    @staticmethod
+    def default_storage_type():
+        return 'disk'
 
     @staticmethod
     def default_quote():
@@ -197,9 +207,9 @@ class FileFormat(ModelSQL, ModelView):
 
     def export_file(self, records):
         if self.file_type == 'csv':
-            self.export_csv(records)
+            return self.export_csv(records)
         elif self.file_type == 'xml':
-            self.export_xml(records)
+            return self.export_xml(records)
         else:
             raise UserError(gettext('file_format.msg_file_type_not_exisit',
                 file_type=self.file_type,
@@ -208,7 +218,7 @@ class FileFormat(ModelSQL, ModelView):
 
     def export_csv(self, records):
         path = self.path
-        if not path:
+        if not path and self.storage_type == 'disk':
             raise UserError(gettext('file_format.msg_path_not_exists',
                 path='',
                 file_format=self.rec_name,
@@ -216,6 +226,7 @@ class FileFormat(ModelSQL, ModelView):
 
         header_line = []
         lines = []
+        result = {}
         for record in records:
             fields = []
             headers = []
@@ -264,43 +275,60 @@ class FileFormat(ModelSQL, ModelView):
             if not header_line:
                 header_line.append(separator.join(headers))
 
-        try:
-            file_path = path + "/" + self.file_name
-            # Control if we need the headers + if the path file doesn't exists
-            # and is a file. To add the headers or not
-            if self.header and not os.path.isfile(file_path):
-                # Write the headers in the file
-                with open(file_path, 'w') as output_file:
-                    for header in header_line:
-                        output_file.write(header + "\r\n")
+        if self.storage_type == 'memory':
+            data = ''
+            if self.header:
+                for header in header_line:
+                    data += header + "\r\n"
+            for line in lines:
+                data += line + "\r\n"
+            result = {x: data for x in records}
+        else:
+            try:
+                file_path = path + "/" + self.file_name
+                # Control if we need the headers + if the path file
+                # doesn't exists and is a file. To add the headers or not
+                if self.header and not os.path.isfile(file_path):
+                    # Write the headers in the file
+                    with open(file_path, 'w') as output_file:
+                        for header in header_line:
+                            output_file.write(header + "\r\n")
 
-            # Put the inselfion in the file
-            with open(file_path, 'a+') as output_file:
-                for line in lines:
-                    output_file.write(line + "\r\n")
-            logger.info('The file "%s" is write correctly' % self.file_name)
-        except:
-            logger.error('Can not write file "%s" correctly' % self.file_name)
+                # Put the inselfion in the file
+                with open(file_path, 'a+') as output_file:
+                    for line in lines:
+                        output_file.write(line + "\r\n")
+                logger.info('The file "%s" is write correctly'
+                    % self.file_name)
+            except:
+                logger.error('Can not write file "%s" correctly'
+                    % self.file_name)
+        return result
 
     def export_xml(self, records):
         path = self.path
-        if not path:
+        if not path and self.storage_type == 'disk':
             raise UserError(gettext('file_format.msg_path_not_exists',
                 path='',
                 file_format=self.rec_name,
                 ))
 
+        result = {}
         for record in records:
             xml = self.eval(self.xml_format, record, self.engine)
-            try:
-                file_path = path + "/" + str(record.id) + self.file_name
-                with open(file_path, 'w') as output_file:
-                    output_file.write(xml)
-                logger.info(
-                    'The file "%s" is write correctly' % self.file_name)
-            except:
-                logger.error(
-                    'Can not write file "%s" correctly' % self.file_name)
+            if self.storage_type == 'memory':
+                result[record] = xml
+            else:
+                try:
+                    file_path = path + "/" + str(record.id) + self.file_name
+                    with open(file_path, 'w') as output_file:
+                        output_file.write(xml)
+                    logger.info(
+                        'The file "%s" is write correctly' % self.file_name)
+                except:
+                    logger.error(
+                        'Can not write file "%s" correctly' % self.file_name)
+            return result
 
 
 class FileFormatField(ModelSQL, ModelView):
