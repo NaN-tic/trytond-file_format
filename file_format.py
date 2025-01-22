@@ -47,9 +47,14 @@ class FileFormat(ModelSQL, ModelView):
     path = fields.Char('Path', states={
             'required': ((Eval('state') == 'active')
                 & (Eval('storage_type') == 'disk')),
+            'invisible': Eval('storage_type') == 'memeory',
             }, depends=['state'],
         help='The path to the file name. The last slash is not necessary.')
-    file_name = fields.Char('File Name', required=True)
+    file_name = fields.Char('File Name', states={
+            'required': ((Eval('state') == 'active')
+                & (Eval('storage_type') == 'disk')),
+            'invisible': Eval('storage_type') == 'memeory',
+            }, depends=['state'])
     file_type = fields.Selection([
             ('csv', 'CSV'),
             ('xml', 'XML'),
@@ -59,7 +64,7 @@ class FileFormat(ModelSQL, ModelView):
             'invisible': Eval('file_type') != 'csv',
             }, help='Header (fields name) on files.')
     separator = fields.Char('Separator', size=1, states={
-            'invisible': Eval('file_type') == 'xml',
+            'invisible': Eval('file_type') != 'csv',
             }, help=('Put here, if it\'s necessary, '
             'the separator between each field.'))
     quote = fields.Char('Quote', size=1, states={
