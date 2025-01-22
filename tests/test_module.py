@@ -33,6 +33,7 @@ class FileFormatTestCase(ModuleTestCase):
 
         file_format = FileFormat()
         file_format.name = 'CSV File Format Test'
+        file_format.storage_type = 'disk'
         file_format.path = os.path.dirname(temp_file.name)
         file_format.file_name = os.path.basename(temp_file.name)
         file_format.file_type = 'csv'
