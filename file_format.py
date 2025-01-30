@@ -333,7 +333,7 @@ class FileFormat(ModelSQL, ModelView):
                 except:
                     logger.error(
                         'Can not write file "%s" correctly' % self.file_name)
-            return result
+        return result
 
 
 class FileFormatField(ModelSQL, ModelView):
