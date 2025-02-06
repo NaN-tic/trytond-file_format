@@ -23,10 +23,10 @@ class FileFormatTestCase(ModuleTestCase):
         FileFormatField = pool.get('file.format.field')
 
         model_model, = Model.search([
-                ('model', '=', 'ir.model'),
+                ('name', '=', 'ir.model'),
                 ])
         file_format_model, = Model.search([
-                ('model', '=', 'file.format'),
+                ('name', '=', 'file.format'),
                 ])
         temp_file = tempfile.NamedTemporaryFile()
         temp_file.close()
@@ -92,10 +92,10 @@ class FileFormatTestCase(ModuleTestCase):
         FileFormat = pool.get('file.format')
 
         model_model, = Model.search([
-                ('model', '=', 'ir.model'),
+                ('name', '=', 'ir.model'),
                 ])
         file_format_model, = Model.search([
-                ('model', '=', 'file.format'),
+                ('name', '=', 'file.format'),
                 ])
         temp_file = tempfile.NamedTemporaryFile()
         temp_file.close()
