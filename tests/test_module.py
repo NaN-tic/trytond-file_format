@@ -43,13 +43,13 @@ class FileFormatTestCase(ModuleTestCase):
         file_format.model = model_model
         file_format.save()
 
-        for i, fieldname in enumerate(('module', 'model', 'name')):
+        for i, fieldname in enumerate(('module', 'name', 'string')):
             field = FileFormatField()
             field.format = file_format
             field.name = fieldname
             field.sequence = i
             field.expression = '{{ record.%s }}' % fieldname
-            if fieldname == 'name':
+            if fieldname == 'string':
                 field.length = 15
                 field.fill_character = '-'
                 field.align = 'right'
@@ -75,9 +75,8 @@ class FileFormatTestCase(ModuleTestCase):
 
         with open(temp_file.name, 'rb') as output_file:
             file_content = output_file.read()
-
         self.assertEqual(file_content, (
-                b'"module","model","name","Numero","Decimal"\r\n'
+                b'"module","name","string","Numero","Decimal"\r\n'
                 b'"file_format","file.format","----File Format","12.00",'
                 b'"10,50"\r\n'))
         os.unlink(temp_file.name)
@@ -111,7 +110,7 @@ class FileFormatTestCase(ModuleTestCase):
             <OpenShipments xmlns="x-schema:OpenShipments.xdr">
                 <OpenShipment ShipmentOption="" ProcessStatus="">
                     <ShipTo>
-                        <CompanyOrName>{{ record.name }}</CompanyOrName>
+                        <CompanyOrName>{{ record.string }}</CompanyOrName>
                     </ShipTo>
                     <ShipmentInformation>
                         <ServiceType>ST</ServiceType>
