@@ -39,24 +39,35 @@ major_version, minor_version, _ = version.split('.', 2)
 major_version = int(major_version)
 minor_version = int(minor_version)
 
-requires = ['genshi', 'jinja2']
+requires = []
 for dep in info.get('depends', []):
     if not re.match(r'(ir|res)(\W|$)', dep):
         prefix = MODULE2PREFIX.get(dep, 'trytond')
         requires.append(get_require_version('%s_%s' % (prefix, dep)))
 requires.append(get_require_version('trytond'))
 
-tests_require = []
+tests_require = [
+    get_require_version('proteus'),
+]
+
+series = '%s.%s' % (major_version, minor_version)
+if minor_version % 2:
+    branch = 'default'
+else:
+    branch = series
+
 dependency_links = []
+
 if minor_version % 2:
     # Add development index for testing with proteus
     dependency_links.append('https://trydevpi.tryton.org/')
 
 setup(name='%s_%s' % (PREFIX, MODULE),
     version=version,
-    description='Tryton module generate CSV files',
+    description='',
     long_description=read('README'),
     author='NaN·tic',
+    author_email='info@nan-tic.com',
     url='http://www.nan-tic.com/',
     download_url="https://bitbucket.org/nantic/trytond-%s" % MODULE,
     package_dir={'trytond.modules.%s' % MODULE: '.'},
@@ -66,7 +77,7 @@ setup(name='%s_%s' % (PREFIX, MODULE),
         ],
     package_data={
         'trytond.modules.%s' % MODULE: (info.get('xml', [])
-            + ['tryton.cfg', 'locale/*.po', 'view/*.xml', 'tests/*.rst']),
+            + ['tryton.cfg', 'locale/*.po', 'tests/*.rst']),
         },
     classifiers=[
         'Development Status :: 5 - Production/Stable',
