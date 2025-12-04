@@ -8,15 +8,14 @@ from trytond.pool import Pool
 from trytond.pyson import Eval, Greater, Not
 from trytond.i18n import gettext
 from trytond.exceptions import UserError
+from trytond.model.exceptions import ValidationError
 from trytond.rpc import RPC
 from trytond.transaction import Transaction
 from genshi.template import TextTemplate
 from jinja2 import Template as Jinja2Template
 
-
-__all__ = ['FileFormat', 'FileFormatField']
-
 logger = logging.getLogger(__name__)
+
 _ENGINES = [
     ('python', 'Python'),
     ('genshi', 'Genshi'),
@@ -136,13 +135,13 @@ class FileFormat(ModelSQL, ModelView):
             if not file_format.path or file_format.state == 'disabled':
                 continue
             if not os.path.isdir(file_format.path):
-                raise UserError(gettext('file_format.msg_path_not_exists',
+                raise ValidationError(gettext('file_format.msg_path_not_exists',
                     path=file_format.path,
                     file_format=file_format.rec_name,
                     ))
             if (not os.access(file_format.path, os.R_OK)
                     or not os.access(file_format.path, os.W_OK)):
-                raise UserError(gettext('file_format.msg_path_no_permission',
+                raise ValidationError(gettext('file_format.msg_path_no_permission',
                     path=file_format.path,
                     file_format=file_format.rec_name,
                     ))
