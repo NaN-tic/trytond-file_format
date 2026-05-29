@@ -46,6 +46,7 @@ for dep in info.get('depends', []):
         prefix = MODULE2PREFIX.get(dep, 'trytond')
         requires.append(get_require_version('%s_%s' % (prefix, dep)))
 requires.append(get_require_version('trytond'))
+requires.append('simpleeval')
 
 tests_require = [
     get_require_version('proteus'),
