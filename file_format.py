@@ -13,6 +13,7 @@ from trytond.rpc import RPC
 from trytond.transaction import Transaction
 from genshi.template import TextTemplate
 from jinja2 import Template as Jinja2Template
+from simpleeval import simple_eval
 
 logger = logging.getLogger(__name__)
 
@@ -181,7 +182,11 @@ class FileFormat(ModelSQL, ModelView):
 
         assert record is not None, 'Record is undefined'
         template_context = cls.template_context(record)
-        return eval(expression, template_context)
+        return simple_eval(
+            expression,
+            names=template_context,
+            functions={k: v for k, v in template_context.items()
+                if callable(v)})
 
     @classmethod
     def _engine_genshi(cls, expression, record):
