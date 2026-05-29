@@ -222,10 +222,9 @@ msgctxt "model:res.group,name:group_file_format_admin"
 msgid "File Format Configuration"
 msgstr "Configuració format fitxer"
 
-#, fuzzy
 msgctxt "selection:file.format.field,align:"
 msgid ""
-msgstr " "
+msgstr ""
 
 msgctxt "selection:file.format.field,align:"
 msgid "Left"
