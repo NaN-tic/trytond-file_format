@@ -7,11 +7,6 @@
         <record model="res.group" id="group_file_format_admin">
             <field name="name">File Format Configuration</field>
         </record>
-        <record model="res.user-res.group"
-            id="user_admin_group_file_format_admin">
-            <field name="user" ref="res.user_admin"/>
-            <field name="group" ref="group_file_format_admin"/>
-        </record>
         <!-- file.format -->
         <record model="ir.ui.view" id="file_format_view_form">
             <field name="model">file.format</field>
